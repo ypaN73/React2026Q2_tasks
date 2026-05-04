@@ -1,7 +1,43 @@
 import { Component } from 'react';
 import './Search.css';
 
-class Search extends Component {
+const STORAGE_KEY = 'pokemon-search-term';
+
+interface SearchProps {
+  onSearch: (term: string) => void;
+}
+
+interface SearchState {
+  term: string;
+}
+
+class Search extends Component<SearchProps, SearchState> {
+  constructor(props: SearchProps) {
+    super(props);
+    const savedTerm = localStorage.getItem(STORAGE_KEY) || '';
+    this.state = { term: savedTerm };
+  }
+
+  componentDidMount() {
+    const { term } = this.state;
+    this.props.onSearch(term);
+  }
+
+  handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    this.setState({ term: e.target.value });
+  };
+
+  handleSearch = () => {
+    const trimmed = this.state.term.trim();
+    const prevSaved = localStorage.getItem(STORAGE_KEY) || '';
+
+    if (trimmed !== prevSaved) {
+      localStorage.setItem(STORAGE_KEY, trimmed);
+    }
+
+    this.props.onSearch(trimmed);
+  };
+
   render() {
     return (
       <section className="search-section">
@@ -10,8 +46,12 @@ class Search extends Component {
             type="text"
             className="search-input"
             placeholder="Search Pokémon..."
+            value={this.state.term}
+            onChange={this.handleInputChange}
           />
-          <button className="search-button">Search</button>
+          <button className="search-button" onClick={this.handleSearch}>
+            Search
+          </button>
         </div>
       </section>
     );
