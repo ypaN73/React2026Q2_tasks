@@ -2,6 +2,7 @@ import { Component } from 'react';
 import Search from './components/Search/Search';
 import Results from './components/Results/Results';
 import ErrorButton from './components/ErrorButton/ErrorButton';
+import ErrorBoundary from './components/ErrorBoundary/ErrorBoundary';
 import type { PokemonItem } from './types/pokemon';
 import { fetchPokemonList } from './services/pokemonApi';
 import './App.css';
@@ -48,18 +49,20 @@ class App extends Component<object, AppState> {
 
   render() {
     return (
-      <div className="app">
-        <Search
-          onSearch={this.handleSearch}
-          previousTerm={this.state.previousTerm}
-        />
-        <Results
-          items={this.state.items}
-          loading={this.state.loading}
-          error={this.state.error}
-        />
-        <ErrorButton />
-      </div>
+      <ErrorBoundary>
+        <div className="app">
+          <Search
+            onSearch={this.handleSearch}
+            previousTerm={this.state.previousTerm}
+          />
+          <Results
+            items={this.state.items}
+            loading={this.state.loading}
+            error={this.state.error}
+          />
+          <ErrorButton />
+        </div>
+      </ErrorBoundary>
     );
   }
 }
