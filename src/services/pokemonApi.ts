@@ -8,9 +8,7 @@ import type {
 const API_BASE = 'https://pokeapi.co/api/v2';
 const LIMIT = 20;
 
-function extractEnglishDescription(
-  species: PokemonSpeciesData
-): string {
+function extractEnglishDescription(species: PokemonSpeciesData): string {
   const entry = species.flavor_text_entries.find(
     (e) => e.language.name === 'en'
   );
@@ -19,7 +17,9 @@ function extractEnglishDescription(
 }
 
 async function fetchSinglePokemon(search: string): Promise<PokemonItem> {
-  const response = await fetch(`${API_BASE}/pokemon/${search.trim().toLowerCase()}`);
+  const response = await fetch(
+    `${API_BASE}/pokemon/${search.trim().toLowerCase()}`
+  );
   if (!response.ok) {
     throw new Error(`Pokémon "${search.trim()}" not found`);
   }
@@ -73,8 +73,7 @@ export async function fetchPokemonList(
             description: 'No description available.',
           };
         }
-        const species: PokemonSpeciesData =
-          await speciesResponse.json();
+        const species: PokemonSpeciesData = await speciesResponse.json();
         return {
           name: result.name,
           url: result.url,

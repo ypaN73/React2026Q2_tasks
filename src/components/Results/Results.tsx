@@ -23,9 +23,7 @@ class Results extends Component<ResultsProps> {
     if (error) {
       return (
         <section className="results-section">
-          <div className="results-status results-status--error">
-            {error}
-          </div>
+          <div className="results-status results-status--error">{error}</div>
         </section>
       );
     }
