@@ -1,0 +1,12 @@
+.results-section {
+  flex: 1;
+  padding: 24px 16px;
+  overflow-y: auto;
+}
+
+.results-placeholder {
+  text-align: center;
+  color: #888;
+  font-size: 18px;
+  margin-top: 60px;
+}

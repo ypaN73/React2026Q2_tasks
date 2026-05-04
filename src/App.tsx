@@ -1,11 +1,16 @@
 import { Component } from 'react';
+import Search from './components/Search/Search';
+import Results from './components/Results/Results';
+import ErrorButton from './components/ErrorButton/ErrorButton';
 import './App.css';
 
 class App extends Component {
   render() {
     return (
       <div className="app">
-        <h1>React2026Q2 Tasks</h1>
+        <Search />
+        <Results />
+        <ErrorButton />
       </div>
     );
   }
