@@ -5,6 +5,7 @@ const STORAGE_KEY = 'pokemon-search-term';
 
 interface SearchProps {
   onSearch: (term: string) => void;
+  previousTerm: string;
 }
 
 interface SearchState {
@@ -29,12 +30,12 @@ class Search extends Component<SearchProps, SearchState> {
 
   handleSearch = () => {
     const trimmed = this.state.term.trim();
-    const prevSaved = localStorage.getItem(STORAGE_KEY) || '';
 
-    if (trimmed !== prevSaved) {
-      localStorage.setItem(STORAGE_KEY, trimmed);
+    if (trimmed === this.props.previousTerm) {
+      return;
     }
 
+    localStorage.setItem(STORAGE_KEY, trimmed);
     this.props.onSearch(trimmed);
   };
 

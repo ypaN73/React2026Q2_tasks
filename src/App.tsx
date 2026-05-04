@@ -10,6 +10,7 @@ interface AppState {
   items: PokemonItem[];
   loading: boolean;
   error: string | null;
+  previousTerm: string;
 }
 
 class App extends Component<object, AppState> {
@@ -19,6 +20,7 @@ class App extends Component<object, AppState> {
       items: [],
       loading: false,
       error: null,
+      previousTerm: '',
     };
   }
 
@@ -27,18 +29,30 @@ class App extends Component<object, AppState> {
 
     try {
       const data = await fetchPokemonList(term);
-      this.setState({ items: data.results, loading: false });
+      this.setState({
+        items: data.results,
+        loading: false,
+        previousTerm: term,
+      });
     } catch (err) {
       const message =
         err instanceof Error ? err.message : 'Something went wrong';
-      this.setState({ error: message, loading: false, items: [] });
+      this.setState({
+        error: message,
+        loading: false,
+        items: [],
+        previousTerm: term,
+      });
     }
   };
 
   render() {
     return (
       <div className="app">
-        <Search onSearch={this.handleSearch} />
+        <Search
+          onSearch={this.handleSearch}
+          previousTerm={this.state.previousTerm}
+        />
         <Results
           items={this.state.items}
           loading={this.state.loading}

@@ -44,7 +44,7 @@ class Results extends Component<ResultsProps> {
           {items.map((item) => (
             <li key={item.name} className="result-card">
               <span className="result-name">{item.name}</span>
-              <span className="result-description">A Pokémon.</span>
+              <span className="result-description">{item.description}</span>
             </li>
           ))}
         </ul>
