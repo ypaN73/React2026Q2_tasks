@@ -9,6 +9,14 @@ React + TypeScript training project for RSSchool React 2026 Q2 course.
 - **Vite**
 - **ESLint** + **Prettier** + **Husky**
 
+## Features
+
+- 🔍 Search Pokémon by name using [PokeAPI](https://pokeapi.co/)
+- 💾 Search term persistence via localStorage
+- ⚠️ Error Boundary with fallback UI
+- ⏳ Loading states for API requests
+- 🧪 "Throw Error" button to test Error Boundary
+
 ## Scripts
 
 - `npm run dev` — start development server
@@ -16,8 +24,6 @@ React + TypeScript training project for RSSchool React 2026 Q2 course.
 - `npm run format:fix` — format code with Prettier
 - `npm run lint` — lint the project
 
-## Project Structure
-
-Task branches are created from `main`:
+## Branch
 
 - `class-components` — Class Components & Error Boundary task

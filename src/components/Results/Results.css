@@ -1,0 +1,53 @@
+.results-section {
+  flex: 1;
+  padding: 24px 16px;
+  overflow-y: auto;
+}
+
+.results-status {
+  text-align: center;
+  color: #888;
+  font-size: 18px;
+  margin-top: 60px;
+}
+
+.results-status--error {
+  color: #ef4444;
+}
+
+.results-list {
+  max-width: 600px;
+  margin: 0 auto;
+  list-style: none;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.result-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 18px;
+  background-color: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  transition: box-shadow 0.2s;
+}
+
+.result-card:hover {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.result-name {
+  font-weight: 600;
+  font-size: 18px;
+  text-transform: capitalize;
+  color: #1f2937;
+}
+
+.result-description {
+  font-size: 14px;
+  color: #6b7280;
+}
