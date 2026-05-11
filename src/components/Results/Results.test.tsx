@@ -22,9 +22,7 @@ describe('Results', () => {
   });
 
   it('renders error message when error is provided', () => {
-    render(
-      <Results items={[]} loading={false} error="Pokémon not found" />
-    );
+    render(<Results items={[]} loading={false} error="Pokémon not found" />);
     expect(screen.getByText('Pokémon not found')).toBeInTheDocument();
   });
 
@@ -57,9 +55,7 @@ describe('Results', () => {
   });
 
   it('prioritizes loading over error', () => {
-    render(
-      <Results items={[]} loading={true} error="Some error" />
-    );
+    render(<Results items={[]} loading={true} error="Some error" />);
     expect(screen.getByText('Loading...')).toBeInTheDocument();
     expect(screen.queryByText('Some error')).not.toBeInTheDocument();
   });

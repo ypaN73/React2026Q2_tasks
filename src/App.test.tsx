@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen, waitFor, act } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import App from './App';
@@ -16,7 +16,8 @@ const mockPokemonList = {
     {
       name: 'ivysaur',
       url: 'https://pokeapi.co/api/v2/pokemon/2/',
-      description: 'When the bulb on its back grows large, it appears to lose the ability to stand on its hind legs.',
+      description:
+        'When the bulb on its back grows large, it appears to lose the ability to stand on its hind legs.',
     },
   ],
 };
@@ -29,7 +30,8 @@ const mockSinglePokemon = {
     {
       name: 'pikachu',
       url: 'https://pokeapi.co/api/v2/pokemon/25/',
-      description: 'When several of these Pokémon gather, their electricity could build and cause lightning storms.',
+      description:
+        'When several of these Pokémon gather, their electricity could build and cause lightning storms.',
     },
   ],
 };
@@ -48,11 +50,13 @@ describe('App', () => {
     vi.clearAllMocks();
   });
 
-  it('renders search and results sections', () => {
+  it('renders search and results sections', async () => {
     (fetchPokemonList as ReturnType<typeof vi.fn>).mockResolvedValue(
       mockPokemonList
     );
-    render(<App />);
+    await act(async () => {
+      render(<App />);
+    });
     expect(
       screen.getByPlaceholderText('Search Pokémon...')
     ).toBeInTheDocument();
@@ -65,7 +69,9 @@ describe('App', () => {
     (fetchPokemonList as ReturnType<typeof vi.fn>).mockResolvedValue(
       mockPokemonList
     );
-    render(<App />);
+    await act(async () => {
+      render(<App />);
+    });
 
     await waitFor(() => {
       expect(fetchPokemonList).toHaveBeenCalledWith('');
@@ -77,7 +83,9 @@ describe('App', () => {
     (fetchPokemonList as ReturnType<typeof vi.fn>).mockResolvedValue(
       mockSinglePokemon
     );
-    render(<App />);
+    await act(async () => {
+      render(<App />);
+    });
 
     await waitFor(() => {
       expect(fetchPokemonList).toHaveBeenCalledWith('pikachu');
@@ -88,7 +96,9 @@ describe('App', () => {
     (fetchPokemonList as ReturnType<typeof vi.fn>).mockResolvedValue(
       mockPokemonList
     );
-    render(<App />);
+    await act(async () => {
+      render(<App />);
+    });
 
     await waitFor(() => {
       expect(screen.getByText('bulbasaur')).toBeInTheDocument();
@@ -100,7 +110,9 @@ describe('App', () => {
     (fetchPokemonList as ReturnType<typeof vi.fn>).mockResolvedValue(
       mockPokemonList
     );
-    render(<App />);
+    await act(async () => {
+      render(<App />);
+    });
 
     await waitFor(() => {
       expect(
@@ -113,9 +125,14 @@ describe('App', () => {
 
   it('shows loading indicator while fetching', async () => {
     (fetchPokemonList as ReturnType<typeof vi.fn>).mockImplementation(
-      () => new Promise((resolve) => setTimeout(() => resolve(mockPokemonList), 100))
+      () =>
+        new Promise((resolve) =>
+          setTimeout(() => resolve(mockPokemonList), 100)
+        )
     );
-    render(<App />);
+    await act(async () => {
+      render(<App />);
+    });
 
     expect(screen.getByText('Loading...')).toBeInTheDocument();
 
@@ -128,7 +145,9 @@ describe('App', () => {
     (fetchPokemonList as ReturnType<typeof vi.fn>).mockRejectedValue(
       new Error('Pokémon "zzzz" not found')
     );
-    render(<App />);
+    await act(async () => {
+      render(<App />);
+    });
 
     const input = screen.getByPlaceholderText('Search Pokémon...');
     const button = screen.getByRole('button', { name: 'Search' });
@@ -147,7 +166,9 @@ describe('App', () => {
     (fetchPokemonList as ReturnType<typeof vi.fn>).mockResolvedValue(
       mockSinglePokemon
     );
-    render(<App />);
+    await act(async () => {
+      render(<App />);
+    });
 
     const input = screen.getByPlaceholderText('Search Pokémon...');
     const button = screen.getByRole('button', { name: 'Search' });
@@ -164,7 +185,9 @@ describe('App', () => {
     (fetchPokemonList as ReturnType<typeof vi.fn>).mockResolvedValue(
       mockSinglePokemon
     );
-    render(<App />);
+    await act(async () => {
+      render(<App />);
+    });
 
     const input = screen.getByPlaceholderText('Search Pokémon...');
     const button = screen.getByRole('button', { name: 'Search' });
@@ -175,11 +198,13 @@ describe('App', () => {
     expect(localStorage.getItem(STORAGE_KEY)).toBe('pikachu');
   });
 
-  it('renders ErrorButton', () => {
+  it('renders ErrorButton', async () => {
     (fetchPokemonList as ReturnType<typeof vi.fn>).mockResolvedValue(
       mockPokemonList
     );
-    render(<App />);
+    await act(async () => {
+      render(<App />);
+    });
     expect(
       screen.getByRole('button', { name: 'Throw Error' })
     ).toBeInTheDocument();
@@ -190,7 +215,9 @@ describe('App', () => {
     (fetchPokemonList as ReturnType<typeof vi.fn>).mockResolvedValue(
       mockPokemonList
     );
-    render(<App />);
+    await act(async () => {
+      render(<App />);
+    });
 
     const errorButton = screen.getByRole('button', { name: 'Throw Error' });
     await userEvent.click(errorButton);
