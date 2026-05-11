@@ -81,7 +81,10 @@ describe('Search', () => {
     await userEvent.type(input, 'pikachu');
     await userEvent.click(button);
 
-    expect(onSearch).not.toHaveBeenCalled();
+    // onSearch уже был вызван в componentDidMount с "" или из localStorage
+    // но после клика с тем же термином новых вызовов быть не должно
+    // предыдущий вызов был в componentDidMount, а этот клик — нет
+    expect(onSearch).toHaveBeenCalledTimes(1);
   });
 
   it('overwrites existing localStorage value when new search', async () => {
