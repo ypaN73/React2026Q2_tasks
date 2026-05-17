@@ -1,4 +1,5 @@
-import { Component } from 'react';
+import { useState, useEffect, useCallback } from 'react';
+import useLocalStorage from '../../hooks/useLocalStorage';
 import './Search.css';
 
 const STORAGE_KEY = 'pokemon-search-term';
@@ -8,55 +9,46 @@ interface SearchProps {
   previousTerm: string;
 }
 
-interface SearchState {
-  term: string;
-}
+function Search({ onSearch, previousTerm }: SearchProps) {
+  const [savedTerm, setSavedTerm] = useLocalStorage(STORAGE_KEY, '');
+  const [term, setTerm] = useState<string>(savedTerm);
 
-class Search extends Component<SearchProps, SearchState> {
-  constructor(props: SearchProps) {
-    super(props);
-    const savedTerm = localStorage.getItem(STORAGE_KEY) || '';
-    this.state = { term: savedTerm };
-  }
+  const handleSearch = useCallback(() => {
+    const trimmed = term.trim();
 
-  componentDidMount() {
-    const { term } = this.state;
-    this.props.onSearch(term);
-  }
-
-  handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    this.setState({ term: e.target.value });
-  };
-
-  handleSearch = () => {
-    const trimmed = this.state.term.trim();
-
-    if (trimmed === this.props.previousTerm) {
+    if (trimmed === previousTerm) {
       return;
     }
 
-    localStorage.setItem(STORAGE_KEY, trimmed);
-    this.props.onSearch(trimmed);
+    setSavedTerm(trimmed);
+    onSearch(trimmed);
+  }, [term, previousTerm, onSearch, setSavedTerm]);
+
+  useEffect(() => {
+    onSearch(term);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setTerm(e.target.value);
   };
 
-  render() {
-    return (
-      <section className="search-section">
-        <div className="search-controls">
-          <input
-            type="text"
-            className="search-input"
-            placeholder="Search Pokémon..."
-            value={this.state.term}
-            onChange={this.handleInputChange}
-          />
-          <button className="search-button" onClick={this.handleSearch}>
-            Search
-          </button>
-        </div>
-      </section>
-    );
-  }
+  return (
+    <section className="search-section">
+      <div className="search-controls">
+        <input
+          type="text"
+          className="search-input"
+          placeholder="Search Pokémon..."
+          value={term}
+          onChange={handleInputChange}
+        />
+        <button className="search-button" onClick={handleSearch}>
+          Search
+        </button>
+      </div>
+    </section>
+  );
 }
 
 export default Search;
