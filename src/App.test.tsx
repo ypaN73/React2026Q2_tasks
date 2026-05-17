@@ -83,7 +83,7 @@ describe('App', () => {
     });
 
     await waitFor(() => {
-      expect(fetchPokemonList).toHaveBeenCalledWith('');
+      expect(fetchPokemonList).toHaveBeenCalledWith('', 1);
     });
   });
 
@@ -97,7 +97,7 @@ describe('App', () => {
     });
 
     await waitFor(() => {
-      expect(fetchPokemonList).toHaveBeenCalledWith('pikachu');
+      expect(fetchPokemonList).toHaveBeenCalledWith('pikachu', 1);
     });
   });
 
@@ -186,7 +186,7 @@ describe('App', () => {
     await userEvent.click(button);
 
     await waitFor(() => {
-      expect(fetchPokemonList).toHaveBeenCalledWith('pikachu');
+      expect(fetchPokemonList).toHaveBeenCalledWith('pikachu', 1);
     });
   });
 

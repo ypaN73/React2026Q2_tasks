@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import useLocalStorage from '../../hooks/useLocalStorage';
 import './Search.css';
 
@@ -7,11 +7,24 @@ const STORAGE_KEY = 'pokemon-search-term';
 interface SearchProps {
   onSearch: (term: string) => void;
   previousTerm: string;
+  onInitialSearch?: (term: string) => void;
 }
 
-function Search({ onSearch, previousTerm }: SearchProps) {
+function Search({ onSearch, previousTerm, onInitialSearch }: SearchProps) {
   const [savedTerm, setSavedTerm] = useLocalStorage(STORAGE_KEY, '');
   const [term, setTerm] = useState<string>(savedTerm);
+  const initialCallDone = useRef(false);
+
+  useEffect(() => {
+    if (!initialCallDone.current && onInitialSearch) {
+      initialCallDone.current = true;
+      onInitialSearch(savedTerm);
+    }
+  }, [savedTerm, onInitialSearch]);
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setTerm(e.target.value);
+  };
 
   const handleSearch = useCallback(() => {
     const trimmed = term.trim();
@@ -23,15 +36,6 @@ function Search({ onSearch, previousTerm }: SearchProps) {
     setSavedTerm(trimmed);
     onSearch(trimmed);
   }, [term, previousTerm, onSearch, setSavedTerm]);
-
-  useEffect(() => {
-    onSearch(term);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setTerm(e.target.value);
-  };
 
   return (
     <section className="search-section">
