@@ -10,7 +10,18 @@ describe('AboutPage', () => {
         <AboutPage />
       </BrowserRouter>
     );
-    expect(screen.getByText('Author: Your Name')).toBeInTheDocument();
+    expect(screen.getByText('Author: Polina')).toBeInTheDocument();
+  });
+
+  it('renders link to GitHub profile', () => {
+    render(
+      <BrowserRouter>
+        <AboutPage />
+      </BrowserRouter>
+    );
+    const link = screen.getByText('GitHub Profile');
+    expect(link).toBeInTheDocument();
+    expect(link).toHaveAttribute('href', 'https://github.com/ypaN73');
   });
 
   it('renders link to RS School React course', () => {
@@ -21,7 +32,7 @@ describe('AboutPage', () => {
     );
     const link = screen.getByText('RS School React Course');
     expect(link).toBeInTheDocument();
-    expect(link).toHaveAttribute('href', 'https://rs.school/react/');
+    expect(link).toHaveAttribute('href', 'https://rs.school/courses/reactjs');
   });
 
   it('renders back to search link', () => {

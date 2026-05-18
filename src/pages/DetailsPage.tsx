@@ -22,33 +22,32 @@ function DetailsPage() {
   const [searchParams] = useSearchParams();
   const [details, setDetails] = useState<PokemonDetails | null>(null);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!detailsId) return;
 
     const fetchDetails = async () => {
       setLoading(true);
-      setError(null);
 
       try {
         const response = await fetch(
           `https://pokeapi.co/api/v2/pokemon/${detailsId}`
         );
         if (!response.ok) {
-          throw new Error('Failed to load details');
+          navigate('/not-found', { replace: true });
+          return;
         }
         const data: PokemonDetails = await response.json();
         setDetails(data);
       } catch {
-        setError('Failed to load Pokémon details');
+        navigate('/not-found', { replace: true });
       } finally {
         setLoading(false);
       }
     };
 
     fetchDetails();
-  }, [detailsId]);
+  }, [detailsId, navigate]);
 
   const handleClose = () => {
     const page = searchParams.get('page') || '1';
@@ -92,10 +91,6 @@ function DetailsPage() {
       </button>
 
       {loading && <div style={{ textAlign: 'center', marginTop: '40px' }}>Loading...</div>}
-
-      {error && (
-        <div style={{ color: '#ef4444', marginTop: '40px' }}>{error}</div>
-      )}
 
       {details && !loading && (
         <div>

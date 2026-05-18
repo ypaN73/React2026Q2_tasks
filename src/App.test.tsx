@@ -251,7 +251,7 @@ describe('App', () => {
     const aboutLink = screen.getByText('About');
     await userEvent.click(aboutLink);
 
-    expect(screen.getByText('Author: Your Name')).toBeInTheDocument();
+    expect(screen.getByText('Author: Polina')).toBeInTheDocument();
   });
 
   it('shows 404 page for unknown route', () => {

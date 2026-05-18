@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import { Routes, Route, Link, useSearchParams, Outlet, useParams } from 'react-router';
+import { Routes, Route, Link, useSearchParams, Outlet } from 'react-router';
 import Search from './components/Search/Search';
 import Results from './components/Results/Results';
 import Pagination from './components/Pagination/Pagination';
@@ -14,7 +14,7 @@ import './App.css';
 
 const ITEMS_PER_PAGE = 20;
 
-function HomePage() {
+function HomeLayout() {
   const [searchParams, setSearchParams] = useSearchParams();
   const [items, setItems] = useState<PokemonItem[]>([]);
   const [loading, setLoading] = useState(false);
@@ -105,23 +105,18 @@ function HomePage() {
 function App() {
   return (
     <ErrorBoundary>
-      <nav
-        style={{
-          padding: '12px 16px',
-          borderBottom: '1px solid #e5e4e7',
-        }}
-      >
-        <Link to="/" style={{ marginRight: '16px' }}>
-          Home
-        </Link>
+      <nav className="app-nav">
+        <Link to="/">Home</Link>
         <Link to="/about">About</Link>
       </nav>
 
       <Routes>
-        <Route path="/" element={<HomePage />}>
-          <Route path=":detailsId" element={<DetailsPage />} />
+        <Route element={<HomeLayout />}>
+          <Route path="/" element={null} />
+          <Route path="/:detailsId" element={<DetailsPage />} />
         </Route>
         <Route path="/about" element={<AboutPage />} />
+        <Route path="/not-found" element={<NotFoundPage />} />
         <Route path="*" element={<NotFoundPage />} />
       </Routes>
     </ErrorBoundary>
