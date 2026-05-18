@@ -1,6 +1,7 @@
 import { render, screen, waitFor, act } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { BrowserRouter, MemoryRouter } from 'react-router';
 import App from './App';
 
 const mockPokemonList = {
@@ -44,6 +45,14 @@ import { fetchPokemonList } from './services/pokemonApi';
 
 const STORAGE_KEY = 'pokemon-search-term';
 
+function renderApp() {
+  return render(
+    <BrowserRouter>
+      <App />
+    </BrowserRouter>
+  );
+}
+
 describe('App', () => {
   beforeEach(() => {
     localStorage.clear();
@@ -55,7 +64,7 @@ describe('App', () => {
       mockPokemonList
     );
     await act(async () => {
-      render(<App />);
+      renderApp();
     });
     expect(
       screen.getByPlaceholderText('Search Pokémon...')
@@ -70,11 +79,11 @@ describe('App', () => {
       mockPokemonList
     );
     await act(async () => {
-      render(<App />);
+      renderApp();
     });
 
     await waitFor(() => {
-      expect(fetchPokemonList).toHaveBeenCalledWith('');
+      expect(fetchPokemonList).toHaveBeenCalledWith('', 1);
     });
   });
 
@@ -84,11 +93,11 @@ describe('App', () => {
       mockSinglePokemon
     );
     await act(async () => {
-      render(<App />);
+      renderApp();
     });
 
     await waitFor(() => {
-      expect(fetchPokemonList).toHaveBeenCalledWith('pikachu');
+      expect(fetchPokemonList).toHaveBeenCalledWith('pikachu', 1);
     });
   });
 
@@ -97,7 +106,7 @@ describe('App', () => {
       mockPokemonList
     );
     await act(async () => {
-      render(<App />);
+      renderApp();
     });
 
     await waitFor(() => {
@@ -111,7 +120,7 @@ describe('App', () => {
       mockPokemonList
     );
     await act(async () => {
-      render(<App />);
+      renderApp();
     });
 
     await waitFor(() => {
@@ -131,7 +140,7 @@ describe('App', () => {
         )
     );
     await act(async () => {
-      render(<App />);
+      renderApp();
     });
 
     expect(screen.getByText('Loading...')).toBeInTheDocument();
@@ -146,7 +155,7 @@ describe('App', () => {
       new Error('Pokémon "zzzz" not found')
     );
     await act(async () => {
-      render(<App />);
+      renderApp();
     });
 
     const input = screen.getByPlaceholderText('Search Pokémon...');
@@ -167,7 +176,7 @@ describe('App', () => {
       mockSinglePokemon
     );
     await act(async () => {
-      render(<App />);
+      renderApp();
     });
 
     const input = screen.getByPlaceholderText('Search Pokémon...');
@@ -177,7 +186,7 @@ describe('App', () => {
     await userEvent.click(button);
 
     await waitFor(() => {
-      expect(fetchPokemonList).toHaveBeenCalledWith('pikachu');
+      expect(fetchPokemonList).toHaveBeenCalledWith('pikachu', 1);
     });
   });
 
@@ -186,7 +195,7 @@ describe('App', () => {
       mockSinglePokemon
     );
     await act(async () => {
-      render(<App />);
+      renderApp();
     });
 
     const input = screen.getByPlaceholderText('Search Pokémon...');
@@ -203,7 +212,7 @@ describe('App', () => {
       mockPokemonList
     );
     await act(async () => {
-      render(<App />);
+      renderApp();
     });
     expect(
       screen.getByRole('button', { name: 'Throw Error' })
@@ -216,7 +225,7 @@ describe('App', () => {
       mockPokemonList
     );
     await act(async () => {
-      render(<App />);
+      renderApp();
     });
 
     const errorButton = screen.getByRole('button', { name: 'Throw Error' });
@@ -229,5 +238,31 @@ describe('App', () => {
       screen.getByText('Test error triggered by Error Button')
     ).toBeInTheDocument();
     consoleSpy.mockRestore();
+  });
+
+  it('navigates to About page', async () => {
+    (fetchPokemonList as ReturnType<typeof vi.fn>).mockResolvedValue(
+      mockPokemonList
+    );
+    await act(async () => {
+      renderApp();
+    });
+
+    const aboutLink = screen.getByText('About');
+    await userEvent.click(aboutLink);
+
+    expect(screen.getByText('Author: Polina')).toBeInTheDocument();
+  });
+
+  it('shows 404 page for unknown route', () => {
+    render(
+      <MemoryRouter initialEntries={['/non/existing/path']}>
+        <App />
+      </MemoryRouter>
+    );
+
+    expect(screen.getByText('404')).toBeInTheDocument();
+    expect(screen.getByText('Page not found')).toBeInTheDocument();
+    expect(screen.getByText('← Back to Home')).toBeInTheDocument();
   });
 });

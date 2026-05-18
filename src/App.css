@@ -3,3 +3,30 @@
   flex-direction: column;
   min-height: 100vh;
 }
+
+.app-nav {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  padding: 16px 24px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  backdrop-filter: blur(8px);
+  position: sticky;
+  top: 0;
+  z-index: 50;
+}
+
+.app-nav a {
+  font-weight: 500;
+  font-size: 0.95rem;
+  color: var(--muted);
+  transition: color 0.2s;
+  padding: 6px 0;
+  border-bottom: 2px solid transparent;
+}
+
+.app-nav a:hover,
+.app-nav a.active {
+  color: var(--primary);
+}

@@ -1,4 +1,4 @@
-import { Component } from 'react';
+import { Link, useSearchParams } from 'react-router';
 import type { PokemonItem } from '../../types/pokemon';
 import './Results.css';
 
@@ -8,47 +8,52 @@ interface ResultsProps {
   error: string | null;
 }
 
-class Results extends Component<ResultsProps> {
-  render() {
-    const { items, loading, error } = this.props;
+function Results({ items, loading, error }: ResultsProps) {
+  const [searchParams] = useSearchParams();
+  const currentPage = searchParams.get('page') || '1';
 
-    if (loading) {
-      return (
-        <section className="results-section">
-          <div className="results-status">Loading...</div>
-        </section>
-      );
-    }
-
-    if (error) {
-      return (
-        <section className="results-section">
-          <div className="results-status results-status--error">{error}</div>
-        </section>
-      );
-    }
-
-    if (items.length === 0) {
-      return (
-        <section className="results-section">
-          <div className="results-status">No Pokémon found.</div>
-        </section>
-      );
-    }
-
+  if (loading) {
     return (
       <section className="results-section">
-        <ul className="results-list">
-          {items.map((item) => (
-            <li key={item.name} className="result-card">
-              <span className="result-name">{item.name}</span>
-              <span className="result-description">{item.description}</span>
-            </li>
-          ))}
-        </ul>
+        <div className="results-status">Loading...</div>
       </section>
     );
   }
+
+  if (error) {
+    return (
+      <section className="results-section">
+        <div className="results-status results-status--error">{error}</div>
+      </section>
+    );
+  }
+
+  if (items.length === 0) {
+    return (
+      <section className="results-section">
+        <div className="results-status">No Pokémon found.</div>
+      </section>
+    );
+  }
+
+  return (
+    <section className="results-section">
+      <ul className="results-list">
+        {items.map((item) => (
+          <li key={item.name}>
+            <Link
+              to={`/${item.name}?page=${currentPage}`}
+              className="result-card"
+              style={{ textDecoration: 'none', color: 'inherit' }}
+            >
+              <span className="result-name">{item.name}</span>
+              <span className="result-description">{item.description}</span>
+            </Link>
+          </li>
+        ))}
+      </ul>
+    </section>
+  );
 }
 
 export default Results;

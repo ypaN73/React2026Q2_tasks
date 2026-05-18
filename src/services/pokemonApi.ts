@@ -42,7 +42,8 @@ async function fetchSinglePokemon(search: string): Promise<PokemonItem> {
 }
 
 export async function fetchPokemonList(
-  search: string
+  search: string,
+  page: number = 1
 ): Promise<PokemonApiResponse> {
   if (search.trim()) {
     const item = await fetchSinglePokemon(search);
@@ -54,7 +55,10 @@ export async function fetchPokemonList(
     };
   }
 
-  const response = await fetch(`${API_BASE}/pokemon?offset=0&limit=${LIMIT}`);
+  const offset = (page - 1) * LIMIT;
+  const response = await fetch(
+    `${API_BASE}/pokemon?offset=${offset}&limit=${LIMIT}`
+  );
   if (!response.ok) {
     throw new Error(`Failed to fetch Pokémon list`);
   }
