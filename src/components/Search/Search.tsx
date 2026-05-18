@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import useLocalStorage from '../../hooks/useLocalStorage';
 import './Search.css';
 
@@ -13,14 +13,14 @@ interface SearchProps {
 function Search({ onSearch, previousTerm, onInitialSearch }: SearchProps) {
   const [savedTerm, setSavedTerm] = useLocalStorage(STORAGE_KEY, '');
   const [term, setTerm] = useState<string>(savedTerm);
-  const initialCallDone = useRef(false);
 
   useEffect(() => {
-    if (!initialCallDone.current && onInitialSearch) {
-      initialCallDone.current = true;
+    if (onInitialSearch) {
       onInitialSearch(savedTerm);
+    } else {
+      onSearch(savedTerm);
     }
-  }, [savedTerm, onInitialSearch]);
+  }, [savedTerm, onSearch, onInitialSearch]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setTerm(e.target.value);

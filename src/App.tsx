@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import { Routes, Route, Link, useSearchParams } from 'react-router';
+import { Routes, Route, Link, useSearchParams, Outlet } from 'react-router';
 import Search from './components/Search/Search';
 import Results from './components/Results/Results';
 import Pagination from './components/Pagination/Pagination';
@@ -7,6 +7,7 @@ import ErrorButton from './components/ErrorButton/ErrorButton';
 import ErrorBoundary from './components/ErrorBoundary/ErrorBoundary';
 import AboutPage from './pages/AboutPage';
 import NotFoundPage from './pages/NotFoundPage';
+import DetailsPage from './pages/DetailsPage';
 import type { PokemonItem } from './types/pokemon';
 import { fetchPokemonList } from './services/pokemonApi';
 import './App.css';
@@ -68,12 +69,12 @@ function HomePage() {
 
   const handlePageChange = useCallback(
     async (newPage: number) => {
-      const newParams = new URLSearchParams();
+      const newParams = new URLSearchParams(searchParams);
       newParams.set('page', String(newPage));
       setSearchParams(newParams);
       await loadData(previousTerm, newPage);
     },
-    [setSearchParams, loadData, previousTerm]
+    [setSearchParams, loadData, previousTerm, searchParams]
   );
 
   return (
@@ -83,14 +84,19 @@ function HomePage() {
         previousTerm={previousTerm}
         onInitialSearch={handleInitialSearch}
       />
-      <Results items={items} loading={loading} error={error} />
-      {!loading && !error && items.length > 0 && (
-        <Pagination
-          page={currentPage}
-          totalPages={totalPages}
-          onPageChange={handlePageChange}
-        />
-      )}
+      <div style={{ display: 'flex', flex: 1, overflow: 'hidden' }}>
+        <div style={{ flex: 1, overflow: 'auto' }}>
+          <Results items={items} loading={loading} error={error} />
+          {!loading && !error && items.length > 0 && (
+            <Pagination
+              page={currentPage}
+              totalPages={totalPages}
+              onPageChange={handlePageChange}
+            />
+          )}
+        </div>
+        <Outlet />
+      </div>
       <ErrorButton />
     </div>
   );
@@ -112,7 +118,9 @@ function App() {
       </nav>
 
       <Routes>
-        <Route path="/" element={<HomePage />} />
+        <Route path="/" element={<HomePage />}>
+          <Route path=":detailsId" element={<DetailsPage />} />
+        </Route>
         <Route path="/about" element={<AboutPage />} />
         <Route path="*" element={<NotFoundPage />} />
       </Routes>

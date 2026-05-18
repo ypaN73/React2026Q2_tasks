@@ -1,3 +1,4 @@
+import { Link, useSearchParams } from 'react-router';
 import type { PokemonItem } from '../../types/pokemon';
 import './Results.css';
 
@@ -8,6 +9,9 @@ interface ResultsProps {
 }
 
 function Results({ items, loading, error }: ResultsProps) {
+  const [searchParams] = useSearchParams();
+  const currentPage = searchParams.get('page') || '1';
+
   if (loading) {
     return (
       <section className="results-section">
@@ -36,9 +40,15 @@ function Results({ items, loading, error }: ResultsProps) {
     <section className="results-section">
       <ul className="results-list">
         {items.map((item) => (
-          <li key={item.name} className="result-card">
-            <span className="result-name">{item.name}</span>
-            <span className="result-description">{item.description}</span>
+          <li key={item.name}>
+            <Link
+              to={`/${item.name}?page=${currentPage}`}
+              className="result-card"
+              style={{ textDecoration: 'none', color: 'inherit' }}
+            >
+              <span className="result-name">{item.name}</span>
+              <span className="result-description">{item.description}</span>
+            </Link>
           </li>
         ))}
       </ul>

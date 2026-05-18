@@ -1,62 +1,100 @@
-import { useState, useEffect, useCallback, useRef } from 'react';
-import useLocalStorage from '../../hooks/useLocalStorage';
-import './Search.css';
+import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+import Search from './Search';
 
 const STORAGE_KEY = 'pokemon-search-term';
 
-interface SearchProps {
-  onSearch: (term: string) => void;
-  previousTerm: string;
-  onInitialSearch?: (term: string) => void;
-}
+describe('Search', () => {
+  beforeEach(() => {
+    localStorage.clear();
+  });
 
-function Search({ onSearch, previousTerm, onInitialSearch }: SearchProps) {
-  const [savedTerm, setSavedTerm] = useLocalStorage(STORAGE_KEY, '');
-  const [term, setTerm] = useState<string>(savedTerm);
-  const initialCallDone = useRef(false);
+  it('renders search input and search button', () => {
+    render(<Search onSearch={vi.fn()} previousTerm="" />);
+    expect(
+      screen.getByPlaceholderText('Search Pokémon...')
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: 'Search' })
+    ).toBeInTheDocument();
+  });
 
-  useEffect(() => {
-    if (!initialCallDone.current) {
-      initialCallDone.current = true;
-      if (onInitialSearch) {
-        onInitialSearch(savedTerm);
-      } else {
-        onSearch(savedTerm);
-      }
-    }
-  }, [savedTerm, onSearch, onInitialSearch]);
+  it('displays previously saved search term from localStorage on mount', () => {
+    localStorage.setItem(STORAGE_KEY, 'pikachu');
+    render(<Search onSearch={vi.fn()} previousTerm="" />);
+    const input = screen.getByPlaceholderText('Search Pokémon...');
+    expect(input).toHaveValue('pikachu');
+  });
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setTerm(e.target.value);
-  };
+  it('shows empty input when no saved term exists', () => {
+    render(<Search onSearch={vi.fn()} previousTerm="" />);
+    const input = screen.getByPlaceholderText('Search Pokémon...');
+    expect(input).toHaveValue('');
+  });
 
-  const handleSearch = useCallback(() => {
-    const trimmed = term.trim();
+  it('updates input value when user types', async () => {
+    render(<Search onSearch={vi.fn()} previousTerm="" />);
+    const input = screen.getByPlaceholderText('Search Pokémon...');
+    await userEvent.type(input, 'charizard');
+    expect(input).toHaveValue('charizard');
+  });
 
-    if (trimmed === previousTerm) {
-      return;
-    }
+  it('calls onSearch on mount with saved term', () => {
+    localStorage.setItem(STORAGE_KEY, 'bulbasaur');
+    const onSearch = vi.fn();
+    render(<Search onSearch={onSearch} previousTerm="" />);
+    expect(onSearch).toHaveBeenCalledWith('bulbasaur');
+  });
 
-    setSavedTerm(trimmed);
-    onSearch(trimmed);
-  }, [term, previousTerm, onSearch, setSavedTerm]);
+  it('calls onSearch with trimmed value when button clicked', async () => {
+    const onSearch = vi.fn();
+    render(<Search onSearch={onSearch} previousTerm="" />);
+    const input = screen.getByPlaceholderText('Search Pokémon...');
+    const button = screen.getByRole('button', { name: 'Search' });
 
-  return (
-    <section className="search-section">
-      <div className="search-controls">
-        <input
-          type="text"
-          className="search-input"
-          placeholder="Search Pokémon..."
-          value={term}
-          onChange={handleInputChange}
-        />
-        <button className="search-button" onClick={handleSearch}>
-          Search
-        </button>
-      </div>
-    </section>
-  );
-}
+    await userEvent.type(input, '  mewtwo  ');
+    await userEvent.click(button);
 
-export default Search;
+    expect(onSearch).toHaveBeenCalledWith('mewtwo');
+  });
+
+  it('saves trimmed term to localStorage on search', async () => {
+    const onSearch = vi.fn();
+    render(<Search onSearch={onSearch} previousTerm="" />);
+    const input = screen.getByPlaceholderText('Search Pokémon...');
+    const button = screen.getByRole('button', { name: 'Search' });
+
+    await userEvent.type(input, '  eevee  ');
+    await userEvent.click(button);
+
+    expect(localStorage.getItem(STORAGE_KEY)).toBe('eevee');
+  });
+
+  it('does not call onSearch if term has not changed', async () => {
+    const onSearch = vi.fn();
+    render(<Search onSearch={onSearch} previousTerm="pikachu" />);
+    const input = screen.getByPlaceholderText('Search Pokémon...');
+    const button = screen.getByRole('button', { name: 'Search' });
+
+    await userEvent.clear(input);
+    await userEvent.type(input, 'pikachu');
+    await userEvent.click(button);
+
+    expect(onSearch).toHaveBeenCalledTimes(1);
+  });
+
+  it('overwrites existing localStorage value when new search', async () => {
+    localStorage.setItem(STORAGE_KEY, 'old-term');
+    const onSearch = vi.fn();
+    render(<Search onSearch={onSearch} previousTerm="old-term" />);
+    const input = screen.getByPlaceholderText('Search Pokémon...');
+    const button = screen.getByRole('button', { name: 'Search' });
+
+    await userEvent.clear(input);
+    await userEvent.type(input, 'new-term');
+    await userEvent.click(button);
+
+    expect(localStorage.getItem(STORAGE_KEY)).toBe('new-term');
+  });
+});
