@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import { Routes, Route, Link, useSearchParams, Outlet } from 'react-router';
+import { Routes, Route, Link, useSearchParams, Outlet, useParams } from 'react-router';
 import Search from './components/Search/Search';
 import Results from './components/Results/Results';
 import Pagination from './components/Pagination/Pagination';

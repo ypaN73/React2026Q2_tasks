@@ -1,7 +1,7 @@
 import { render, screen, waitFor, act } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { BrowserRouter } from 'react-router';
+import { BrowserRouter, MemoryRouter } from 'react-router';
 import App from './App';
 
 const mockPokemonList = {
@@ -238,5 +238,31 @@ describe('App', () => {
       screen.getByText('Test error triggered by Error Button')
     ).toBeInTheDocument();
     consoleSpy.mockRestore();
+  });
+
+  it('navigates to About page', async () => {
+    (fetchPokemonList as ReturnType<typeof vi.fn>).mockResolvedValue(
+      mockPokemonList
+    );
+    await act(async () => {
+      renderApp();
+    });
+
+    const aboutLink = screen.getByText('About');
+    await userEvent.click(aboutLink);
+
+    expect(screen.getByText('Author: Your Name')).toBeInTheDocument();
+  });
+
+  it('shows 404 page for unknown route', () => {
+    render(
+      <MemoryRouter initialEntries={['/non/existing/path']}>
+        <App />
+      </MemoryRouter>
+    );
+
+    expect(screen.getByText('404')).toBeInTheDocument();
+    expect(screen.getByText('Page not found')).toBeInTheDocument();
+    expect(screen.getByText('← Back to Home')).toBeInTheDocument();
   });
 });
