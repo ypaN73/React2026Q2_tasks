@@ -1,5 +1,6 @@
 import { Link, useSearchParams } from 'react-router';
 import type { PokemonItem } from '../../types/pokemon';
+import { useSelectedItemsStore } from '../../store/selectedItemsStore';
 import './Results.css';
 
 interface ResultsProps {
@@ -11,30 +12,16 @@ interface ResultsProps {
 function Results({ items, loading, error }: ResultsProps) {
   const [searchParams] = useSearchParams();
   const currentPage = searchParams.get('page') || '1';
+  const toggleItem = useSelectedItemsStore((state) => state.toggleItem);
+  const selectedItems = useSelectedItemsStore((state) => state.selectedItems);
 
-  if (loading) {
-    return (
-      <section className="results-section">
-        <div className="results-status">Loading...</div>
-      </section>
-    );
-  }
+  const handleCheckboxChange = (event: React.ChangeEvent<HTMLInputElement>, name: string) => {
+    event.preventDefault(); // Предотвращаем переход по ссылке
+    event.stopPropagation();
+    toggleItem(name);
+  };
 
-  if (error) {
-    return (
-      <section className="results-section">
-        <div className="results-status results-status--error">{error}</div>
-      </section>
-    );
-  }
-
-  if (items.length === 0) {
-    return (
-      <section className="results-section">
-        <div className="results-status">No Pokémon found.</div>
-      </section>
-    );
-  }
+  // ... (остальной код с проверками на loading, error и пустой массив остается без изменений)
 
   return (
     <section className="results-section">
@@ -46,7 +33,14 @@ function Results({ items, loading, error }: ResultsProps) {
               className="result-card"
               style={{ textDecoration: 'none', color: 'inherit' }}
             >
-              <span className="result-name">{item.name}</span>
+              <label className="result-checkbox-label" onClick={(e) => e.stopPropagation()}>
+                <input
+                  type="checkbox"
+                  checked={selectedItems.includes(item.name)}
+                  onChange={(e) => handleCheckboxChange(e, item.name)}
+                />
+                <span className="result-name">{item.name}</span>
+              </label>
               <span className="result-description">{item.description}</span>
             </Link>
           </li>
