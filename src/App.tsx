@@ -11,6 +11,7 @@ import DetailsPage from './pages/DetailsPage';
 import type { PokemonItem } from './types/pokemon';
 import { fetchPokemonList } from './services/pokemonApi';
 import './App.css';
+import Flyout from './components/Flyout/Flyout';
 
 const ITEMS_PER_PAGE = 20;
 
@@ -97,6 +98,7 @@ function HomeLayout() {
         </div>
         <Outlet />
       </div>
+      <Flyout />
       <ErrorButton />
     </div>
   );

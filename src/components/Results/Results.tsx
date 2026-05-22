@@ -16,12 +16,34 @@ function Results({ items, loading, error }: ResultsProps) {
   const selectedItems = useSelectedItemsStore((state) => state.selectedItems);
 
   const handleCheckboxChange = (event: React.ChangeEvent<HTMLInputElement>, name: string) => {
-    event.preventDefault(); // Предотвращаем переход по ссылке
+    event.preventDefault();
     event.stopPropagation();
     toggleItem(name);
   };
 
-  // ... (остальной код с проверками на loading, error и пустой массив остается без изменений)
+  if (loading) {
+    return (
+      <section className="results-section">
+        <div className="results-status">Loading...</div>
+      </section>
+    );
+  }
+
+  if (error) {
+    return (
+      <section className="results-section">
+        <div className="results-status results-status--error">{error}</div>
+      </section>
+    );
+  }
+
+  if (items.length === 0) {
+    return (
+      <section className="results-section">
+        <div className="results-status">No Pokémon found.</div>
+      </section>
+    );
+  }
 
   return (
     <section className="results-section">
