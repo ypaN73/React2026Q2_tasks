@@ -2,6 +2,9 @@ import { render, screen } from '@testing-library/react';
 import { describe, it, expect } from 'vitest';
 import { BrowserRouter } from 'react-router';
 import Results from './Results';
+import userEvent from '@testing-library/user-event';
+import { useSelectedItemsStore } from '../../store/selectedItemsStore';
+import { beforeEach } from 'vitest';
 
 const mockItems = [
   {
@@ -15,6 +18,10 @@ const mockItems = [
     description: 'Obviously prefers hot places.',
   },
 ];
+
+beforeEach(() => {
+  useSelectedItemsStore.setState({ selectedItems: [] });
+});
 
 function renderResults(props: {
   items: typeof mockItems;
@@ -71,5 +78,45 @@ describe('Results', () => {
     renderResults({ items: [], loading: true, error: 'Some error' });
     expect(screen.getByText('Loading...')).toBeInTheDocument();
     expect(screen.queryByText('Some error')).not.toBeInTheDocument();
+  });
+
+  it('renders checkbox for each item', () => {
+    renderResults({ items: mockItems, loading: false, error: null });
+    const checkboxes = screen.getAllByRole('checkbox');
+    expect(checkboxes).toHaveLength(2);
+  });
+
+  it('checkbox is unchecked by default', () => {
+    renderResults({ items: mockItems, loading: false, error: null });
+    const checkbox = screen.getAllByRole('checkbox')[0];
+    expect(checkbox).not.toBeChecked();
+  });
+
+  it('selects item when checkbox clicked', async () => {
+    renderResults({ items: mockItems, loading: false, error: null });
+    const checkbox = screen.getAllByRole('checkbox')[0];
+
+    await userEvent.click(checkbox);
+
+    expect(useSelectedItemsStore.getState().selectedItems).toContain('bulbasaur');
+  });
+
+  it('unselects item when checkbox clicked again', async () => {
+    useSelectedItemsStore.setState({ selectedItems: ['bulbasaur'] });
+    renderResults({ items: mockItems, loading: false, error: null });
+    const checkbox = screen.getAllByRole('checkbox')[0];
+
+    await userEvent.click(checkbox);
+
+    expect(useSelectedItemsStore.getState().selectedItems).not.toContain('bulbasaur');
+  });
+
+  it('checkbox reflects selected state from store', () => {
+    useSelectedItemsStore.setState({ selectedItems: ['charmander'] });
+    renderResults({ items: mockItems, loading: false, error: null });
+
+    const checkboxes = screen.getAllByRole('checkbox');
+    expect(checkboxes[0]).not.toBeChecked();
+    expect(checkboxes[1]).toBeChecked();
   });
 });

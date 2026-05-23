@@ -112,7 +112,11 @@ function App() {
       <nav className="app-nav">
         <Link to="/">Home</Link>
         <Link to="/about">About</Link>
-        <button onClick={toggleTheme} style={{ marginLeft: 'auto' }}>
+        <button
+          onClick={toggleTheme}
+          className="theme-toggle-btn"
+          aria-label={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}
+        >
           {theme === 'light' ? '🌙 Dark' : '☀️ Light'}
         </button>
       </nav>

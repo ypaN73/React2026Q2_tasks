@@ -54,14 +54,14 @@ function Results({ items, loading, error }: ResultsProps) {
               className="result-card"
               style={{ textDecoration: 'none', color: 'inherit' }}
             >
-              <label className="result-checkbox-label" onClick={(e) => e.stopPropagation()}>
-                <input
-                  type="checkbox"
-                  checked={selectedItems.includes(item.name)}
-                  onChange={(e) => handleCheckboxChange(e, item.name)}
-                />
-                <span className="result-name">{item.name}</span>
-              </label>
+              <input
+                type="checkbox"
+                className="result-checkbox"
+                checked={selectedItems.includes(item.name)}
+                onChange={(e) => handleCheckboxChange(e, item.name)}
+                onClick={(e) => e.stopPropagation()}
+              />
+              <span className="result-name">{item.name}</span>
               <span className="result-description">{item.description}</span>
             </Link>
           </li>
