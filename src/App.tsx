@@ -12,6 +12,7 @@ import type { PokemonItem } from './types/pokemon';
 import { fetchPokemonList } from './services/pokemonApi';
 import './App.css';
 import Flyout from './components/Flyout/Flyout';
+import { useTheme } from './hooks/useTheme';
 
 const ITEMS_PER_PAGE = 20;
 
@@ -105,11 +106,15 @@ function HomeLayout() {
 }
 
 function App() {
+  const { theme, toggleTheme } = useTheme();
   return (
     <ErrorBoundary>
       <nav className="app-nav">
         <Link to="/">Home</Link>
         <Link to="/about">About</Link>
+        <button onClick={toggleTheme} style={{ marginLeft: 'auto' }}>
+          {theme === 'light' ? '🌙 Dark' : '☀️ Light'}
+        </button>
       </nav>
 
       <Routes>
