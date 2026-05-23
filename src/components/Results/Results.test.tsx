@@ -1,10 +1,9 @@
 import { render, screen } from '@testing-library/react';
-import { describe, it, expect } from 'vitest';
+import userEvent from '@testing-library/user-event';
+import { describe, it, expect, beforeEach } from 'vitest';
 import { BrowserRouter } from 'react-router';
 import Results from './Results';
-import userEvent from '@testing-library/user-event';
 import { useSelectedItemsStore } from '../../store/selectedItemsStore';
-import { beforeEach } from 'vitest';
 
 const mockItems = [
   {
@@ -19,10 +18,6 @@ const mockItems = [
   },
 ];
 
-beforeEach(() => {
-  useSelectedItemsStore.setState({ selectedItems: [] });
-});
-
 function renderResults(props: {
   items: typeof mockItems;
   loading: boolean;
@@ -36,6 +31,10 @@ function renderResults(props: {
 }
 
 describe('Results', () => {
+  beforeEach(() => {
+    useSelectedItemsStore.setState({ selectedItems: [] });
+  });
+
   it('renders loading indicator when loading is true', () => {
     renderResults({ items: [], loading: true, error: null });
     expect(screen.getByText('Loading...')).toBeInTheDocument();
@@ -98,21 +97,39 @@ describe('Results', () => {
 
     await userEvent.click(checkbox);
 
-    expect(useSelectedItemsStore.getState().selectedItems).toContain('bulbasaur');
+    const selectedItems = useSelectedItemsStore.getState().selectedItems;
+    expect(selectedItems.some((item) => item.name === 'bulbasaur')).toBe(true);
   });
 
   it('unselects item when checkbox clicked again', async () => {
-    useSelectedItemsStore.setState({ selectedItems: ['bulbasaur'] });
+    useSelectedItemsStore.setState({
+      selectedItems: [
+        {
+          name: 'bulbasaur',
+          url: 'https://pokeapi.co/api/v2/pokemon/1/',
+          description: 'A strange seed was planted on its back at birth.',
+        },
+      ],
+    });
     renderResults({ items: mockItems, loading: false, error: null });
     const checkbox = screen.getAllByRole('checkbox')[0];
 
     await userEvent.click(checkbox);
 
-    expect(useSelectedItemsStore.getState().selectedItems).not.toContain('bulbasaur');
+    const selectedItems = useSelectedItemsStore.getState().selectedItems;
+    expect(selectedItems.some((item) => item.name === 'bulbasaur')).toBe(false);
   });
 
   it('checkbox reflects selected state from store', () => {
-    useSelectedItemsStore.setState({ selectedItems: ['charmander'] });
+    useSelectedItemsStore.setState({
+      selectedItems: [
+        {
+          name: 'charmander',
+          url: 'https://pokeapi.co/api/v2/pokemon/4/',
+          description: 'Obviously prefers hot places.',
+        },
+      ],
+    });
     renderResults({ items: mockItems, loading: false, error: null });
 
     const checkboxes = screen.getAllByRole('checkbox');

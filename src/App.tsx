@@ -99,7 +99,7 @@ function HomeLayout() {
         </div>
         <Outlet />
       </div>
-      <Flyout allItems={items} />
+      <Flyout />
       <ErrorButton />
     </div>
   );

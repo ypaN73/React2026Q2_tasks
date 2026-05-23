@@ -15,9 +15,9 @@ function Results({ items, loading, error }: ResultsProps) {
   const toggleItem = useSelectedItemsStore((state) => state.toggleItem);
   const selectedItems = useSelectedItemsStore((state) => state.selectedItems);
 
-  const handleCheckboxChange = (event: React.ChangeEvent<HTMLInputElement>, name: string) => {
+  const handleCheckboxChange = (event: React.ChangeEvent<HTMLInputElement>, item: PokemonItem) => {
     event.stopPropagation();
-    toggleItem(name);
+    toggleItem(item);
   };
 
   if (loading) {
@@ -57,8 +57,8 @@ function Results({ items, loading, error }: ResultsProps) {
               <input
                 type="checkbox"
                 className="result-checkbox"
-                checked={selectedItems.includes(item.name)}
-                onChange={(e) => handleCheckboxChange(e, item.name)}
+                checked={selectedItems.some((selected) => selected.name === item.name)}
+                onChange={(e) => handleCheckboxChange(e, item)}
                 onClick={(e) => e.stopPropagation()}
               />
               <span className="result-name">{item.name}</span>

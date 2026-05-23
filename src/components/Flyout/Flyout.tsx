@@ -1,12 +1,7 @@
 import { useSelectedItemsStore } from '../../store/selectedItemsStore';
 import './Flyout.css';
-import type { PokemonItem } from '../../types/pokemon';
 
-interface FlyoutProps {
-  allItems: PokemonItem[];
-}
-
-function Flyout({ allItems }: FlyoutProps) {
+function Flyout() {
   const selectedItems = useSelectedItemsStore((state) => state.selectedItems);
   const unselectAll = useSelectedItemsStore((state) => state.unselectAll);
 
@@ -17,12 +12,8 @@ function Flyout({ allItems }: FlyoutProps) {
   }
 
   const handleDownload = () => {
-    const selectedPokemonData = allItems.filter((item) =>
-      selectedItems.includes(item.name)
-    );
-
     const csvHeader = 'Name,Description,Details URL';
-    const csvRows = selectedPokemonData.map(
+    const csvRows = selectedItems.map(
       (item) => `"${item.name}","${item.description}","${window.location.origin}/${item.name}"`
     );
     const csvContent = [csvHeader, ...csvRows].join('\n');

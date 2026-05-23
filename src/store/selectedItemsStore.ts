@@ -1,18 +1,24 @@
 import { create } from 'zustand';
+import type { PokemonItem } from '../types/pokemon';
 
 interface SelectedItemsState {
-  selectedItems: string[];
-  toggleItem: (name: string) => void;
+  selectedItems: PokemonItem[];
+  toggleItem: (item: PokemonItem) => void;
   unselectAll: () => void;
 }
 
 export const useSelectedItemsStore = create<SelectedItemsState>((set) => ({
   selectedItems: [],
-  toggleItem: (name: string) =>
-    set((state) => ({
-      selectedItems: state.selectedItems.includes(name)
-        ? state.selectedItems.filter((item) => item !== name)
-        : [...state.selectedItems, name],
-    })),
+  toggleItem: (item: PokemonItem) =>
+    set((state) => {
+      const isSelected = state.selectedItems.some(
+        (selected) => selected.name === item.name
+      );
+      return {
+        selectedItems: isSelected
+          ? state.selectedItems.filter((selected) => selected.name !== item.name)
+          : [...state.selectedItems, item],
+      };
+    }),
   unselectAll: () => set({ selectedItems: [] }),
 }));
