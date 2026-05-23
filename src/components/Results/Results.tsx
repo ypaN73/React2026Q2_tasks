@@ -16,7 +16,6 @@ function Results({ items, loading, error }: ResultsProps) {
   const selectedItems = useSelectedItemsStore((state) => state.selectedItems);
 
   const handleCheckboxChange = (event: React.ChangeEvent<HTMLInputElement>, name: string) => {
-    event.preventDefault();
     event.stopPropagation();
     toggleItem(name);
   };
