@@ -3,26 +3,26 @@
   justify-content: center;
   align-items: center;
   min-height: 100vh;
-  background-color: #f8f0f0;
+  background-color: var(--bg);
 }
 
 .error-boundary-content {
   text-align: center;
   padding: 40px;
-  background-color: #fff;
+  background-color: var(--surface);
   border-radius: 12px;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
   max-width: 500px;
 }
 
 .error-boundary-content h2 {
-  color: #dc2626;
+  color: var(--error);
   font-size: 24px;
   margin-bottom: 12px;
 }
 
 .error-boundary-message {
-  color: #4b5563;
+  color: var(--text);
   font-size: 16px;
   margin-bottom: 24px;
 }
@@ -32,7 +32,7 @@
   font-size: 16px;
   font-weight: 600;
   color: #fff;
-  background-color: #3b82f6;
+  background-color: var(--primary);
   border: none;
   border-radius: 6px;
   cursor: pointer;
@@ -40,5 +40,5 @@
 }
 
 .error-boundary-reset:hover {
-  background-color: #2563eb;
+  background-color: var(--primary-hover);
 }

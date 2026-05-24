@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate, useSearchParams } from 'react-router';
+import './DetailsPage.css';
 
 interface PokemonDetails {
   id: number;
@@ -59,63 +60,30 @@ function DetailsPage() {
   }
 
   return (
-    <div
-      style={{
-        position: 'fixed',
-        top: 0,
-        right: 0,
-        width: '400px',
-        maxWidth: '100%',
-        height: '100vh',
-        backgroundColor: '#fff',
-        boxShadow: '-4px 0 12px rgba(0, 0, 0, 0.1)',
-        padding: '24px',
-        overflowY: 'auto',
-        zIndex: 100,
-      }}
-    >
-      <button
-        onClick={handleClose}
-        style={{
-          position: 'absolute',
-          top: '16px',
-          right: '16px',
-          background: 'none',
-          border: 'none',
-          fontSize: '24px',
-          cursor: 'pointer',
-          color: '#6b7280',
-        }}
-      >
+    <div className="details-panel">
+      <button className="details-close-btn" onClick={handleClose}>
         ✕
       </button>
 
-      {loading && <div style={{ textAlign: 'center', marginTop: '40px' }}>Loading...</div>}
+      {loading && <div className="details-loading">Loading...</div>}
 
       {details && !loading && (
         <div>
-          <h2 style={{ textTransform: 'capitalize', marginBottom: '16px' }}>
-            {details.name}
-          </h2>
+          <h2 className="details-name">{details.name}</h2>
           {details.sprites.front_default && (
             <img
               src={details.sprites.front_default}
               alt={details.name}
-              style={{
-                width: '200px',
-                height: '200px',
-                display: 'block',
-                margin: '0 auto 16px',
-              }}
+              className="details-image"
             />
           )}
-          <p>
+          <p className="details-info">
             <strong>Height:</strong> {details.height}
           </p>
-          <p>
+          <p className="details-info">
             <strong>Weight:</strong> {details.weight}
           </p>
-          <p>
+          <p className="details-info">
             <strong>Types:</strong>{' '}
             {details.types.map((t) => t.type.name).join(', ')}
           </p>
