@@ -16,6 +16,21 @@ function extractEnglishDescription(species: PokemonSpeciesData): string {
   return entry.flavor_text.replace(/[\f\n\r]/g, ' ');
 }
 
+async function fetchPokemonDescription(name: string): Promise<string> {
+  try {
+    const speciesResponse = await fetch(
+      `${API_BASE}/pokemon-species/${name}`
+    );
+    if (!speciesResponse.ok) {
+      return 'No description available.';
+    }
+    const species: PokemonSpeciesData = await speciesResponse.json();
+    return extractEnglishDescription(species);
+  } catch {
+    return 'No description available.';
+  }
+}
+
 async function fetchSinglePokemon(search: string): Promise<PokemonItem> {
   const response = await fetch(
     `${API_BASE}/pokemon/${search.trim().toLowerCase()}`
@@ -25,19 +40,12 @@ async function fetchSinglePokemon(search: string): Promise<PokemonItem> {
   }
   const data = await response.json();
 
-  const speciesResponse = await fetch(data.species.url);
-  if (!speciesResponse.ok) {
-    return {
-      name: data.name,
-      url: `${API_BASE}/pokemon/${data.id}/`,
-      description: 'No description available.',
-    };
-  }
-  const species: PokemonSpeciesData = await speciesResponse.json();
+  const description = await fetchPokemonDescription(data.name);
+
   return {
     name: data.name,
     url: `${API_BASE}/pokemon/${data.id}/`,
-    description: extractEnglishDescription(species),
+    description,
   };
 }
 
@@ -66,30 +74,12 @@ export async function fetchPokemonList(
 
   const resultsWithDescriptions = await Promise.all(
     data.results.map(async (result: PokemonListResult) => {
-      try {
-        const speciesResponse = await fetch(
-          `${API_BASE}/pokemon-species/${result.name}`
-        );
-        if (!speciesResponse.ok) {
-          return {
-            name: result.name,
-            url: result.url,
-            description: 'No description available.',
-          };
-        }
-        const species: PokemonSpeciesData = await speciesResponse.json();
-        return {
-          name: result.name,
-          url: result.url,
-          description: extractEnglishDescription(species),
-        };
-      } catch {
-        return {
-          name: result.name,
-          url: result.url,
-          description: 'No description available.',
-        };
-      }
+      const description = await fetchPokemonDescription(result.name);
+      return {
+        name: result.name,
+        url: result.url,
+        description,
+      };
     })
   );
 

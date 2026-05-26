@@ -11,6 +11,8 @@ import DetailsPage from './pages/DetailsPage';
 import type { PokemonItem } from './types/pokemon';
 import { fetchPokemonList } from './services/pokemonApi';
 import './App.css';
+import Flyout from './components/Flyout/Flyout';
+import { useTheme } from './hooks/useTheme';
 
 const ITEMS_PER_PAGE = 20;
 
@@ -97,17 +99,26 @@ function HomeLayout() {
         </div>
         <Outlet />
       </div>
+      <Flyout />
       <ErrorButton />
     </div>
   );
 }
 
 function App() {
+  const { theme, toggleTheme } = useTheme();
   return (
     <ErrorBoundary>
       <nav className="app-nav">
         <Link to="/">Home</Link>
         <Link to="/about">About</Link>
+        <button
+          onClick={toggleTheme}
+          className="theme-toggle-btn"
+          aria-label={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}
+        >
+          {theme === 'light' ? '🌙 Dark' : '☀️ Light'}
+        </button>
       </nav>
 
       <Routes>

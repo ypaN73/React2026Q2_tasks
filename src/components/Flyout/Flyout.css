@@ -1,0 +1,54 @@
+.flyout {
+  position: sticky;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: var(--surface);
+  border-top: 2px solid var(--primary);
+  padding: 16px 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  z-index: 60;
+  box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.05);
+  margin-top: auto;
+}
+
+.flyout-count {
+  font-weight: 600;
+  color: var(--text-h);
+}
+
+.flyout-actions {
+  display: flex;
+  gap: 12px;
+}
+
+.flyout-button {
+  padding: 8px 20px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  font-family: inherit;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--bg);
+  color: var(--text);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.flyout-button:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.flyout-button--primary {
+  background: var(--primary);
+  color: #fff;
+  border-color: var(--primary);
+}
+
+.flyout-button--primary:hover {
+  background: var(--primary-hover);
+  color: #fff;
+}

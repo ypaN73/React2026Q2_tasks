@@ -1,5 +1,6 @@
 import { Link, useSearchParams } from 'react-router';
 import type { PokemonItem } from '../../types/pokemon';
+import { useSelectedItemsStore } from '../../store/selectedItemsStore';
 import './Results.css';
 
 interface ResultsProps {
@@ -11,6 +12,13 @@ interface ResultsProps {
 function Results({ items, loading, error }: ResultsProps) {
   const [searchParams] = useSearchParams();
   const currentPage = searchParams.get('page') || '1';
+  const toggleItem = useSelectedItemsStore((state) => state.toggleItem);
+  const selectedItems = useSelectedItemsStore((state) => state.selectedItems);
+
+  const handleCheckboxChange = (event: React.ChangeEvent<HTMLInputElement>, item: PokemonItem) => {
+    event.stopPropagation();
+    toggleItem(item);
+  };
 
   if (loading) {
     return (
@@ -46,6 +54,13 @@ function Results({ items, loading, error }: ResultsProps) {
               className="result-card"
               style={{ textDecoration: 'none', color: 'inherit' }}
             >
+              <input
+                type="checkbox"
+                className="result-checkbox"
+                checked={selectedItems.some((selected) => selected.name === item.name)}
+                onChange={(e) => handleCheckboxChange(e, item)}
+                onClick={(e) => e.stopPropagation()}
+              />
               <span className="result-name">{item.name}</span>
               <span className="result-description">{item.description}</span>
             </Link>

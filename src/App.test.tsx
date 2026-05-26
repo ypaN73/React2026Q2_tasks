@@ -3,6 +3,7 @@ import userEvent from '@testing-library/user-event';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { BrowserRouter, MemoryRouter } from 'react-router';
 import App from './App';
+import { ThemeProvider } from './context/ThemeProvider';
 
 const mockPokemonList = {
   count: 2,
@@ -47,9 +48,11 @@ const STORAGE_KEY = 'pokemon-search-term';
 
 function renderApp() {
   return render(
-    <BrowserRouter>
-      <App />
-    </BrowserRouter>
+    <ThemeProvider>
+      <BrowserRouter>
+        <App />
+      </BrowserRouter>
+    </ThemeProvider>
   );
 }
 
@@ -256,9 +259,11 @@ describe('App', () => {
 
   it('shows 404 page for unknown route', () => {
     render(
-      <MemoryRouter initialEntries={['/non/existing/path']}>
-        <App />
-      </MemoryRouter>
+      <ThemeProvider>
+        <MemoryRouter initialEntries={['/non/existing/path']}>
+          <App />
+        </MemoryRouter>
+      </ThemeProvider>
     );
 
     expect(screen.getByText('404')).toBeInTheDocument();
