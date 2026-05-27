@@ -2,10 +2,11 @@ import { render, screen, waitFor, act } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { BrowserRouter, MemoryRouter } from 'react-router';
+import { QueryClientProvider, QueryClient } from '@tanstack/react-query';
 import App from './App';
 import { ThemeProvider } from './context/ThemeProvider';
 
-const mockPokemonList = {
+const mockPokemonListResponse = {
   count: 2,
   next: null,
   previous: null,
@@ -24,7 +25,7 @@ const mockPokemonList = {
   ],
 };
 
-const mockSinglePokemon = {
+const mockSinglePokemonResponse = {
   count: 1,
   next: null,
   previous: null,
@@ -38,37 +39,48 @@ const mockSinglePokemon = {
   ],
 };
 
-vi.mock('./services/pokemonApi', () => ({
-  fetchPokemonList: vi.fn(),
-}));
-
-import { fetchPokemonList } from './services/pokemonApi';
-
 const STORAGE_KEY = 'pokemon-search-term';
 
+function createQueryClient() {
+  return new QueryClient({
+    defaultOptions: {
+      queries: {
+        retry: false,
+        gcTime: 0,
+      },
+    },
+  });
+}
+
 function renderApp() {
+  const queryClient = createQueryClient();
   return render(
-    <ThemeProvider>
-      <BrowserRouter>
-        <App />
-      </BrowserRouter>
-    </ThemeProvider>
+    <QueryClientProvider client={queryClient}>
+      <ThemeProvider>
+        <BrowserRouter>
+          <App />
+        </BrowserRouter>
+      </ThemeProvider>
+    </QueryClientProvider>
   );
 }
 
 describe('App', () => {
   beforeEach(() => {
     localStorage.clear();
-    vi.clearAllMocks();
+    vi.restoreAllMocks();
   });
 
   it('renders search and results sections', async () => {
-    (fetchPokemonList as ReturnType<typeof vi.fn>).mockResolvedValue(
-      mockPokemonList
-    );
+    globalThis.fetch = vi.fn().mockResolvedValueOnce({
+      ok: true,
+      json: () => Promise.resolve(mockPokemonListResponse),
+    });
+
     await act(async () => {
       renderApp();
     });
+
     expect(
       screen.getByPlaceholderText('Search Pokémon...')
     ).toBeInTheDocument();
@@ -78,36 +90,62 @@ describe('App', () => {
   });
 
   it('fetches all pokemon on initial load with empty search', async () => {
-    (fetchPokemonList as ReturnType<typeof vi.fn>).mockResolvedValue(
-      mockPokemonList
-    );
+    globalThis.fetch = vi.fn().mockResolvedValueOnce({
+      ok: true,
+      json: () => Promise.resolve(mockPokemonListResponse),
+    });
+
     await act(async () => {
       renderApp();
     });
 
     await waitFor(() => {
-      expect(fetchPokemonList).toHaveBeenCalledWith('', 1);
+      expect(screen.getByText('bulbasaur')).toBeInTheDocument();
     });
   });
 
   it('fetches pokemon with saved term from localStorage', async () => {
     localStorage.setItem(STORAGE_KEY, 'pikachu');
-    (fetchPokemonList as ReturnType<typeof vi.fn>).mockResolvedValue(
-      mockSinglePokemon
-    );
+
+    globalThis.fetch = vi
+      .fn()
+      .mockResolvedValueOnce({
+        ok: true,
+        json: () =>
+          Promise.resolve({
+            id: 25,
+            name: 'pikachu',
+          }),
+      })
+      .mockResolvedValueOnce({
+        ok: true,
+        json: () =>
+          Promise.resolve({
+            flavor_text_entries: [
+              {
+                flavor_text:
+                  'When several of these Pokémon gather, their electricity could build and cause lightning storms.',
+                language: { name: 'en' },
+              },
+            ],
+          }),
+      });
+
     await act(async () => {
       renderApp();
     });
 
     await waitFor(() => {
-      expect(fetchPokemonList).toHaveBeenCalledWith('pikachu', 1);
+      expect(screen.getByText('pikachu')).toBeInTheDocument();
     });
   });
 
   it('displays pokemon names after successful fetch', async () => {
-    (fetchPokemonList as ReturnType<typeof vi.fn>).mockResolvedValue(
-      mockPokemonList
-    );
+    globalThis.fetch = vi.fn().mockResolvedValueOnce({
+      ok: true,
+      json: () => Promise.resolve(mockPokemonListResponse),
+    });
+
     await act(async () => {
       renderApp();
     });
@@ -119,9 +157,11 @@ describe('App', () => {
   });
 
   it('displays pokemon descriptions after successful fetch', async () => {
-    (fetchPokemonList as ReturnType<typeof vi.fn>).mockResolvedValue(
-      mockPokemonList
-    );
+    globalThis.fetch = vi.fn().mockResolvedValueOnce({
+      ok: true,
+      json: () => Promise.resolve(mockPokemonListResponse),
+    });
+
     await act(async () => {
       renderApp();
     });
@@ -136,12 +176,20 @@ describe('App', () => {
   });
 
   it('shows loading indicator while fetching', async () => {
-    (fetchPokemonList as ReturnType<typeof vi.fn>).mockImplementation(
+    globalThis.fetch = vi.fn().mockImplementation(
       () =>
         new Promise((resolve) =>
-          setTimeout(() => resolve(mockPokemonList), 100)
+          setTimeout(
+            () =>
+              resolve({
+                ok: true,
+                json: () => Promise.resolve(mockPokemonListResponse),
+              }),
+            100
+          )
         )
     );
+
     await act(async () => {
       renderApp();
     });
@@ -154,9 +202,13 @@ describe('App', () => {
   });
 
   it('shows error message on failed API call', async () => {
-    (fetchPokemonList as ReturnType<typeof vi.fn>).mockRejectedValue(
-      new Error('Pokémon "zzzz" not found')
-    );
+    globalThis.fetch = vi
+      .fn()
+      .mockResolvedValueOnce({
+        ok: false,
+        status: 404,
+      });
+
     await act(async () => {
       renderApp();
     });
@@ -175,9 +227,30 @@ describe('App', () => {
   });
 
   it('searches for specific pokemon when search button clicked', async () => {
-    (fetchPokemonList as ReturnType<typeof vi.fn>).mockResolvedValue(
-      mockSinglePokemon
-    );
+    globalThis.fetch = vi
+      .fn()
+      .mockResolvedValueOnce({
+        ok: true,
+        json: () =>
+          Promise.resolve({
+            id: 25,
+            name: 'pikachu',
+          }),
+      })
+      .mockResolvedValueOnce({
+        ok: true,
+        json: () =>
+          Promise.resolve({
+            flavor_text_entries: [
+              {
+                flavor_text:
+                  'When several of these Pokémon gather, their electricity could build and cause lightning storms.',
+                language: { name: 'en' },
+              },
+            ],
+          }),
+      });
+
     await act(async () => {
       renderApp();
     });
@@ -185,18 +258,40 @@ describe('App', () => {
     const input = screen.getByPlaceholderText('Search Pokémon...');
     const button = screen.getByRole('button', { name: 'Search' });
 
+    await userEvent.clear(input);
     await userEvent.type(input, 'pikachu');
     await userEvent.click(button);
 
     await waitFor(() => {
-      expect(fetchPokemonList).toHaveBeenCalledWith('pikachu', 1);
+      expect(screen.getByText('pikachu')).toBeInTheDocument();
     });
   });
 
   it('saves search term to localStorage on search', async () => {
-    (fetchPokemonList as ReturnType<typeof vi.fn>).mockResolvedValue(
-      mockSinglePokemon
-    );
+    globalThis.fetch = vi
+      .fn()
+      .mockResolvedValueOnce({
+        ok: true,
+        json: () =>
+          Promise.resolve({
+            id: 25,
+            name: 'pikachu',
+          }),
+      })
+      .mockResolvedValueOnce({
+        ok: true,
+        json: () =>
+          Promise.resolve({
+            flavor_text_entries: [
+              {
+                flavor_text:
+                  'When several of these Pokémon gather, their electricity could build and cause lightning storms.',
+                language: { name: 'en' },
+              },
+            ],
+          }),
+      });
+
     await act(async () => {
       renderApp();
     });
@@ -204,6 +299,7 @@ describe('App', () => {
     const input = screen.getByPlaceholderText('Search Pokémon...');
     const button = screen.getByRole('button', { name: 'Search' });
 
+    await userEvent.clear(input);
     await userEvent.type(input, 'pikachu');
     await userEvent.click(button);
 
@@ -211,12 +307,15 @@ describe('App', () => {
   });
 
   it('renders ErrorButton', async () => {
-    (fetchPokemonList as ReturnType<typeof vi.fn>).mockResolvedValue(
-      mockPokemonList
-    );
+    globalThis.fetch = vi.fn().mockResolvedValueOnce({
+      ok: true,
+      json: () => Promise.resolve(mockPokemonListResponse),
+    });
+
     await act(async () => {
       renderApp();
     });
+
     expect(
       screen.getByRole('button', { name: 'Throw Error' })
     ).toBeInTheDocument();
@@ -224,9 +323,12 @@ describe('App', () => {
 
   it('shows error boundary fallback when ErrorButton clicked', async () => {
     const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => { });
-    (fetchPokemonList as ReturnType<typeof vi.fn>).mockResolvedValue(
-      mockPokemonList
-    );
+
+    globalThis.fetch = vi.fn().mockResolvedValueOnce({
+      ok: true,
+      json: () => Promise.resolve(mockPokemonListResponse),
+    });
+
     await act(async () => {
       renderApp();
     });
@@ -240,13 +342,16 @@ describe('App', () => {
     expect(
       screen.getByText('Test error triggered by Error Button')
     ).toBeInTheDocument();
+
     consoleSpy.mockRestore();
   });
 
   it('navigates to About page', async () => {
-    (fetchPokemonList as ReturnType<typeof vi.fn>).mockResolvedValue(
-      mockPokemonList
-    );
+    globalThis.fetch = vi.fn().mockResolvedValueOnce({
+      ok: true,
+      json: () => Promise.resolve(mockPokemonListResponse),
+    });
+
     await act(async () => {
       renderApp();
     });
@@ -258,12 +363,16 @@ describe('App', () => {
   });
 
   it('shows 404 page for unknown route', () => {
+    const queryClient = createQueryClient();
+
     render(
-      <ThemeProvider>
-        <MemoryRouter initialEntries={['/non/existing/path']}>
-          <App />
-        </MemoryRouter>
-      </ThemeProvider>
+      <QueryClientProvider client={queryClient}>
+        <ThemeProvider>
+          <MemoryRouter initialEntries={['/non/existing/path']}>
+            <App />
+          </MemoryRouter>
+        </ThemeProvider>
+      </QueryClientProvider>
     );
 
     expect(screen.getByText('404')).toBeInTheDocument();

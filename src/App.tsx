@@ -8,75 +8,51 @@ import ErrorBoundary from './components/ErrorBoundary/ErrorBoundary';
 import AboutPage from './pages/AboutPage';
 import NotFoundPage from './pages/NotFoundPage';
 import DetailsPage from './pages/DetailsPage';
-import type { PokemonItem } from './types/pokemon';
-import { fetchPokemonList } from './services/pokemonApi';
 import './App.css';
 import Flyout from './components/Flyout/Flyout';
 import { useTheme } from './hooks/useTheme';
+import { usePokemonList } from './hooks/api/usePokemonList';
 
 const ITEMS_PER_PAGE = 20;
 
 function HomeLayout() {
   const [searchParams, setSearchParams] = useSearchParams();
-  const [items, setItems] = useState<PokemonItem[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
   const [previousTerm, setPreviousTerm] = useState('');
-  const [totalCount, setTotalCount] = useState(0);
-
   const currentPage = Number(searchParams.get('page')) || 1;
 
+  const { data, isLoading, error } = usePokemonList(previousTerm, currentPage);
+
+  const items = data?.results ?? [];
+  const totalCount = data?.count ?? 0;
   const totalPages = Math.max(1, Math.ceil(totalCount / ITEMS_PER_PAGE));
 
-  const loadData = useCallback(
-    async (term: string, page: number) => {
-      setLoading(true);
-      setError(null);
-
-      try {
-        const data = await fetchPokemonList(term, page);
-        setItems(data.results);
-        setTotalCount(data.count);
-      } catch (err) {
-        const message =
-          err instanceof Error ? err.message : 'Something went wrong';
-        setError(message);
-        setItems([]);
-        setTotalCount(0);
-      } finally {
-        setLoading(false);
-      }
-    },
-    []
-  );
+  const loading = isLoading;
+  const errorMessage = error instanceof Error ? error.message : null;
 
   const handleSearch = useCallback(
-    async (term: string) => {
+    (term: string) => {
       setPreviousTerm(term);
       const newParams = new URLSearchParams();
       newParams.set('page', '1');
       setSearchParams(newParams);
-      await loadData(term, 1);
     },
-    [setSearchParams, loadData]
+    [setSearchParams]
   );
 
   const handleInitialSearch = useCallback(
-    async (term: string) => {
+    (term: string) => {
       setPreviousTerm(term);
-      await loadData(term, currentPage);
     },
-    [currentPage, loadData]
+    []
   );
 
   const handlePageChange = useCallback(
-    async (newPage: number) => {
+    (newPage: number) => {
       const newParams = new URLSearchParams(searchParams);
       newParams.set('page', String(newPage));
       setSearchParams(newParams);
-      await loadData(previousTerm, newPage);
     },
-    [setSearchParams, loadData, previousTerm, searchParams]
+    [setSearchParams, searchParams]
   );
 
   return (
@@ -88,8 +64,8 @@ function HomeLayout() {
       />
       <div style={{ display: 'flex', flex: 1, overflow: 'hidden' }}>
         <div style={{ flex: 1, overflow: 'auto' }}>
-          <Results items={items} loading={loading} error={error} />
-          {!loading && !error && items.length > 0 && (
+          <Results items={items} loading={loading} error={errorMessage} />
+          {!loading && !errorMessage && items.length > 0 && (
             <Pagination
               page={currentPage}
               totalPages={totalPages}
