@@ -12,6 +12,7 @@ import './App.css';
 import Flyout from './components/Flyout/Flyout';
 import { useTheme } from './hooks/useTheme';
 import { usePokemonList } from './hooks/api/usePokemonList';
+import RefreshButton from './components/RefreshButton/RefreshButton';
 
 const ITEMS_PER_PAGE = 20;
 
@@ -62,6 +63,9 @@ function HomeLayout() {
         previousTerm={previousTerm}
         onInitialSearch={handleInitialSearch}
       />
+      <div style={{ display: 'flex', justifyContent: 'center', padding: '12px 24px 0' }}>
+        <RefreshButton />
+      </div>
       <div style={{ display: 'flex', flex: 1, overflow: 'hidden' }}>
         <div style={{ flex: 1, overflow: 'auto' }}>
           <Results items={items} loading={loading} error={errorMessage} />
