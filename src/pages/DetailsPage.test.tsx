@@ -2,6 +2,7 @@ import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { MemoryRouter, Route, Routes } from 'react-router';
+import { QueryClientProvider, QueryClient } from '@tanstack/react-query';
 import DetailsPage from './DetailsPage';
 import NotFoundPage from './NotFoundPage';
 
@@ -18,14 +19,28 @@ const mockPokemonDetails = {
   ],
 };
 
+function createQueryClient() {
+  return new QueryClient({
+    defaultOptions: {
+      queries: {
+        retry: false,
+        gcTime: 0,
+      },
+    },
+  });
+}
+
 function renderDetailsPage(initialEntries: string[]) {
+  const queryClient = createQueryClient();
   return render(
-    <MemoryRouter initialEntries={initialEntries}>
-      <Routes>
-        <Route path="/:detailsId" element={<DetailsPage />} />
-        <Route path="/not-found" element={<NotFoundPage />} />
-      </Routes>
-    </MemoryRouter>
+    <QueryClientProvider client={queryClient}>
+      <MemoryRouter initialEntries={initialEntries}>
+        <Routes>
+          <Route path="/:detailsId" element={<DetailsPage />} />
+          <Route path="/not-found" element={<NotFoundPage />} />
+        </Routes>
+      </MemoryRouter>
+    </QueryClientProvider>
   );
 }
 
@@ -104,11 +119,13 @@ describe('DetailsPage', () => {
     });
 
     render(
-      <MemoryRouter initialEntries={['/pikachu?page=2']}>
-        <Routes>
-          <Route path="/:detailsId" element={<DetailsPage />} />
-        </Routes>
-      </MemoryRouter>
+      <QueryClientProvider client={createQueryClient()}>
+        <MemoryRouter initialEntries={['/pikachu?page=2']}>
+          <Routes>
+            <Route path="/:detailsId" element={<DetailsPage />} />
+          </Routes>
+        </MemoryRouter>
+      </QueryClientProvider>
     );
 
     await waitFor(() => {

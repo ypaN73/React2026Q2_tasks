@@ -25,20 +25,6 @@ const mockPokemonListResponse = {
   ],
 };
 
-const mockSinglePokemonResponse = {
-  count: 1,
-  next: null,
-  previous: null,
-  results: [
-    {
-      name: 'pikachu',
-      url: 'https://pokeapi.co/api/v2/pokemon/25/',
-      description:
-        'When several of these Pokémon gather, their electricity could build and cause lightning storms.',
-    },
-  ],
-};
-
 const STORAGE_KEY = 'pokemon-search-term';
 
 function createQueryClient() {
