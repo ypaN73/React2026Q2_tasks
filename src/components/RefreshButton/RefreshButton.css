@@ -1,0 +1,25 @@
+.refresh-button {
+  padding: 8px 20px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  font-family: inherit;
+  color: var(--text);
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.refresh-button:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+  background: var(--bg);
+}
+
+.refresh-button:active {
+  transform: scale(0.97);
+}
