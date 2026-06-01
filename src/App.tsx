@@ -28,7 +28,11 @@ function HomeLayout() {
   const totalPages = Math.max(1, Math.ceil(totalCount / ITEMS_PER_PAGE));
 
   const loading = isLoading;
-  const errorMessage = error instanceof Error ? error.message : null;
+  const errorMessage = error instanceof Error
+    ? error.message
+    : error
+      ? String(error)
+      : null;
 
   const handleSearch = useCallback(
     (term: string) => {

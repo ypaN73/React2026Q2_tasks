@@ -50,4 +50,24 @@ describe('useLocalStorage', () => {
 
     localStorage.getItem = originalGetItem;
   });
+
+  it('handles localStorage.setItem throwing error and still updates state', () => {
+    const originalSetItem = localStorage.setItem;
+
+    const { result } = renderHook(() =>
+      useLocalStorage('test-key', 'default')
+    );
+
+    localStorage.setItem = vi.fn().mockImplementation(() => {
+      throw new Error('Storage full');
+    });
+
+    act(() => {
+      result.current[1]('new-value');
+    });
+
+    expect(result.current[0]).toBe('new-value');
+
+    localStorage.setItem = originalSetItem;
+  });
 });

@@ -149,4 +149,31 @@ describe('fetchPokemonList', () => {
       'No description available.'
     );
   });
+
+  it('returns fallback description when no english entry exists', async () => {
+    globalThis.fetch = vi
+      .fn()
+      .mockResolvedValueOnce({
+        ok: true,
+        json: () => Promise.resolve(mockPokemonDetail),
+      })
+      .mockResolvedValueOnce({
+        ok: true,
+        json: () =>
+          Promise.resolve({
+            flavor_text_entries: [
+              {
+                flavor_text: 'Un pokémon électrique.',
+                language: { name: 'fr' },
+              },
+            ],
+          }),
+      });
+
+    const result = await fetchPokemonList('pikachu');
+
+    expect(result.results[0].description).toBe(
+      'No description available.'
+    );
+  });
 });

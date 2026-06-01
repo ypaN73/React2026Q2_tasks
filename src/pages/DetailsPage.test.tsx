@@ -14,9 +14,7 @@ const mockPokemonDetails = {
   sprites: {
     front_default: 'https://example.com/pikachu.png',
   },
-  types: [
-    { type: { name: 'electric' } },
-  ],
+  types: [{ type: { name: 'electric' } }],
 };
 
 function createQueryClient() {
@@ -50,12 +48,15 @@ describe('DetailsPage', () => {
   });
 
   it('renders nothing when no detailsId', () => {
+    const queryClient = createQueryClient();
     const { container } = render(
-      <MemoryRouter initialEntries={['/']}>
-        <Routes>
-          <Route path="/" element={<DetailsPage />} />
-        </Routes>
-      </MemoryRouter>
+      <QueryClientProvider client={queryClient}>
+        <MemoryRouter initialEntries={['/']}>
+          <Routes>
+            <Route path="/" element={<DetailsPage />} />
+          </Routes>
+        </MemoryRouter>
+      </QueryClientProvider>
     );
     expect(container.firstChild).toBeNull();
   });
@@ -118,15 +119,7 @@ describe('DetailsPage', () => {
       json: () => Promise.resolve(mockPokemonDetails),
     });
 
-    render(
-      <QueryClientProvider client={createQueryClient()}>
-        <MemoryRouter initialEntries={['/pikachu?page=2']}>
-          <Routes>
-            <Route path="/:detailsId" element={<DetailsPage />} />
-          </Routes>
-        </MemoryRouter>
-      </QueryClientProvider>
-    );
+    renderDetailsPage(['/pikachu?page=2']);
 
     await waitFor(() => {
       expect(screen.getByText('pikachu')).toBeInTheDocument();
@@ -134,5 +127,36 @@ describe('DetailsPage', () => {
 
     const closeButton = screen.getByText('✕');
     await userEvent.click(closeButton);
+  });
+
+  it('redirects to /not-found when pokemon not found', async () => {
+    globalThis.fetch = vi.fn().mockResolvedValueOnce({
+      ok: false,
+      status: 404,
+    });
+
+    renderDetailsPage(['/nonexistent']);
+
+    await waitFor(() => {
+      expect(screen.getByText('404')).toBeInTheDocument();
+      expect(screen.getByText('Page not found')).toBeInTheDocument();
+    });
+  });
+
+  it('makes single fetch on first open', async () => {
+    const fetchSpy = vi.fn().mockResolvedValueOnce({
+      ok: true,
+      json: () => Promise.resolve(mockPokemonDetails),
+    });
+
+    globalThis.fetch = fetchSpy;
+
+    renderDetailsPage(['/pikachu?page=1']);
+
+    await waitFor(() => {
+      expect(screen.getByText('pikachu')).toBeInTheDocument();
+    });
+
+    expect(fetchSpy.mock.calls.length).toBe(1);
   });
 });

@@ -9,6 +9,9 @@ const API_BASE = 'https://pokeapi.co/api/v2';
 const LIMIT = 20;
 
 function extractEnglishDescription(species: PokemonSpeciesData): string {
+  if (!species.flavor_text_entries || species.flavor_text_entries.length === 0) {
+    return 'No description available.';
+  }
   const entry = species.flavor_text_entries.find(
     (e) => e.language.name === 'en'
   );

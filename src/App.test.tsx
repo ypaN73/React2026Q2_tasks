@@ -6,25 +6,6 @@ import { QueryClientProvider, QueryClient } from '@tanstack/react-query';
 import App from './App';
 import { ThemeProvider } from './context/ThemeProvider';
 
-const mockPokemonListResponse = {
-  count: 2,
-  next: null,
-  previous: null,
-  results: [
-    {
-      name: 'bulbasaur',
-      url: 'https://pokeapi.co/api/v2/pokemon/1/',
-      description: 'A strange seed was planted on its back at birth.',
-    },
-    {
-      name: 'ivysaur',
-      url: 'https://pokeapi.co/api/v2/pokemon/2/',
-      description:
-        'When the bulb on its back grows large, it appears to lose the ability to stand on its hind legs.',
-    },
-  ],
-};
-
 const STORAGE_KEY = 'pokemon-search-term';
 
 function createQueryClient() {
@@ -51,6 +32,10 @@ function renderApp() {
   );
 }
 
+const bulbasaurDescription = 'A strange seed was planted on its back at birth.';
+const ivysaurDescription =
+  'When the bulb on its back grows large, it appears to lose the ability to stand on its hind legs.';
+
 describe('App', () => {
   beforeEach(() => {
     localStorage.clear();
@@ -60,7 +45,13 @@ describe('App', () => {
   it('renders search and results sections', async () => {
     globalThis.fetch = vi.fn().mockResolvedValueOnce({
       ok: true,
-      json: () => Promise.resolve(mockPokemonListResponse),
+      json: () =>
+        Promise.resolve({
+          count: 0,
+          next: null,
+          previous: null,
+          results: [],
+        }),
     });
 
     await act(async () => {
@@ -76,10 +67,39 @@ describe('App', () => {
   });
 
   it('fetches all pokemon on initial load with empty search', async () => {
-    globalThis.fetch = vi.fn().mockResolvedValueOnce({
-      ok: true,
-      json: () => Promise.resolve(mockPokemonListResponse),
-    });
+    globalThis.fetch = vi
+      .fn()
+      .mockResolvedValueOnce({
+        ok: true,
+        json: () =>
+          Promise.resolve({
+            count: 2,
+            next: null,
+            previous: null,
+            results: [
+              { name: 'bulbasaur', url: 'https://pokeapi.co/api/v2/pokemon/1/' },
+              { name: 'ivysaur', url: 'https://pokeapi.co/api/v2/pokemon/2/' },
+            ],
+          }),
+      })
+      .mockResolvedValueOnce({
+        ok: true,
+        json: () =>
+          Promise.resolve({
+            flavor_text_entries: [
+              { flavor_text: bulbasaurDescription, language: { name: 'en' } },
+            ],
+          }),
+      })
+      .mockResolvedValueOnce({
+        ok: true,
+        json: () =>
+          Promise.resolve({
+            flavor_text_entries: [
+              { flavor_text: ivysaurDescription, language: { name: 'en' } },
+            ],
+          }),
+      });
 
     await act(async () => {
       renderApp();
@@ -95,6 +115,16 @@ describe('App', () => {
 
     globalThis.fetch = vi
       .fn()
+      .mockResolvedValueOnce({
+        ok: true,
+        json: () =>
+          Promise.resolve({
+            count: 0,
+            next: null,
+            previous: null,
+            results: [],
+          }),
+      })
       .mockResolvedValueOnce({
         ok: true,
         json: () =>
@@ -127,10 +157,39 @@ describe('App', () => {
   });
 
   it('displays pokemon names after successful fetch', async () => {
-    globalThis.fetch = vi.fn().mockResolvedValueOnce({
-      ok: true,
-      json: () => Promise.resolve(mockPokemonListResponse),
-    });
+    globalThis.fetch = vi
+      .fn()
+      .mockResolvedValueOnce({
+        ok: true,
+        json: () =>
+          Promise.resolve({
+            count: 2,
+            next: null,
+            previous: null,
+            results: [
+              { name: 'bulbasaur', url: 'https://pokeapi.co/api/v2/pokemon/1/' },
+              { name: 'ivysaur', url: 'https://pokeapi.co/api/v2/pokemon/2/' },
+            ],
+          }),
+      })
+      .mockResolvedValueOnce({
+        ok: true,
+        json: () =>
+          Promise.resolve({
+            flavor_text_entries: [
+              { flavor_text: bulbasaurDescription, language: { name: 'en' } },
+            ],
+          }),
+      })
+      .mockResolvedValueOnce({
+        ok: true,
+        json: () =>
+          Promise.resolve({
+            flavor_text_entries: [
+              { flavor_text: ivysaurDescription, language: { name: 'en' } },
+            ],
+          }),
+      });
 
     await act(async () => {
       renderApp();
@@ -143,22 +202,48 @@ describe('App', () => {
   });
 
   it('displays pokemon descriptions after successful fetch', async () => {
-    globalThis.fetch = vi.fn().mockResolvedValueOnce({
-      ok: true,
-      json: () => Promise.resolve(mockPokemonListResponse),
-    });
+    globalThis.fetch = vi
+      .fn()
+      .mockResolvedValueOnce({
+        ok: true,
+        json: () =>
+          Promise.resolve({
+            count: 2,
+            next: null,
+            previous: null,
+            results: [
+              { name: 'bulbasaur', url: 'https://pokeapi.co/api/v2/pokemon/1/' },
+              { name: 'ivysaur', url: 'https://pokeapi.co/api/v2/pokemon/2/' },
+            ],
+          }),
+      })
+      .mockResolvedValueOnce({
+        ok: true,
+        json: () =>
+          Promise.resolve({
+            flavor_text_entries: [
+              { flavor_text: bulbasaurDescription, language: { name: 'en' } },
+            ],
+          }),
+      })
+      .mockResolvedValueOnce({
+        ok: true,
+        json: () =>
+          Promise.resolve({
+            flavor_text_entries: [
+              { flavor_text: ivysaurDescription, language: { name: 'en' } },
+            ],
+          }),
+      });
 
     await act(async () => {
       renderApp();
     });
 
     await waitFor(() => {
-      expect(
-        screen.getByText(
-          'A strange seed was planted on its back at birth.'
-        )
-      ).toBeInTheDocument();
+      expect(screen.getByText(bulbasaurDescription)).toBeInTheDocument();
     });
+    expect(screen.getByText(ivysaurDescription)).toBeInTheDocument();
   });
 
   it('shows loading indicator while fetching', async () => {
@@ -169,7 +254,13 @@ describe('App', () => {
             () =>
               resolve({
                 ok: true,
-                json: () => Promise.resolve(mockPokemonListResponse),
+                json: () =>
+                  Promise.resolve({
+                    count: 0,
+                    next: null,
+                    previous: null,
+                    results: [],
+                  }),
               }),
             100
           )
@@ -191,6 +282,16 @@ describe('App', () => {
     globalThis.fetch = vi
       .fn()
       .mockResolvedValueOnce({
+        ok: true,
+        json: () =>
+          Promise.resolve({
+            count: 0,
+            next: null,
+            previous: null,
+            results: [],
+          }),
+      })
+      .mockResolvedValueOnce({
         ok: false,
         status: 404,
       });
@@ -202,6 +303,7 @@ describe('App', () => {
     const input = screen.getByPlaceholderText('Search Pokémon...');
     const button = screen.getByRole('button', { name: 'Search' });
 
+    await userEvent.clear(input);
     await userEvent.type(input, 'zzzz');
     await userEvent.click(button);
 
@@ -215,6 +317,16 @@ describe('App', () => {
   it('searches for specific pokemon when search button clicked', async () => {
     globalThis.fetch = vi
       .fn()
+      .mockResolvedValueOnce({
+        ok: true,
+        json: () =>
+          Promise.resolve({
+            count: 0,
+            next: null,
+            previous: null,
+            results: [],
+          }),
+      })
       .mockResolvedValueOnce({
         ok: true,
         json: () =>
@@ -260,6 +372,16 @@ describe('App', () => {
         ok: true,
         json: () =>
           Promise.resolve({
+            count: 0,
+            next: null,
+            previous: null,
+            results: [],
+          }),
+      })
+      .mockResolvedValueOnce({
+        ok: true,
+        json: () =>
+          Promise.resolve({
             id: 25,
             name: 'pikachu',
           }),
@@ -295,7 +417,13 @@ describe('App', () => {
   it('renders ErrorButton', async () => {
     globalThis.fetch = vi.fn().mockResolvedValueOnce({
       ok: true,
-      json: () => Promise.resolve(mockPokemonListResponse),
+      json: () =>
+        Promise.resolve({
+          count: 0,
+          next: null,
+          previous: null,
+          results: [],
+        }),
     });
 
     await act(async () => {
@@ -312,7 +440,13 @@ describe('App', () => {
 
     globalThis.fetch = vi.fn().mockResolvedValueOnce({
       ok: true,
-      json: () => Promise.resolve(mockPokemonListResponse),
+      json: () =>
+        Promise.resolve({
+          count: 0,
+          next: null,
+          previous: null,
+          results: [],
+        }),
     });
 
     await act(async () => {
@@ -335,7 +469,13 @@ describe('App', () => {
   it('navigates to About page', async () => {
     globalThis.fetch = vi.fn().mockResolvedValueOnce({
       ok: true,
-      json: () => Promise.resolve(mockPokemonListResponse),
+      json: () =>
+        Promise.resolve({
+          count: 0,
+          next: null,
+          previous: null,
+          results: [],
+        }),
     });
 
     await act(async () => {
