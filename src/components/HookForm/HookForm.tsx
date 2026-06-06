@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useForm } from 'react-hook-form';
+import { useForm, useWatch } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import Modal from '../Modal/Modal';
 import { formSchema, type FormSchemaType } from '../../validation/formSchema';
@@ -19,7 +19,7 @@ function HookForm({ isOpen, onClose }: HookFormProps) {
   const {
     register,
     handleSubmit,
-    watch,
+    control,
     reset,
     setError,
     formState: { errors, isValid },
@@ -39,7 +39,7 @@ function HookForm({ isOpen, onClose }: HookFormProps) {
     },
   });
 
-  const password = watch('password', '');
+  const password = useWatch({ control, name: 'password', defaultValue: '' });
 
   const resetForm = () => {
     reset();
