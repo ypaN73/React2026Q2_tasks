@@ -16,15 +16,20 @@ function Modal({ isOpen, onClose, children, title }: ModalProps) {
   const modalRef = useRef<HTMLDivElement>(null);
   const previousActiveElement = useRef<Element | null>(null);
 
-  // ✅ Используем useMemo вместо useRef — значение не меняется между рендерами
   const titleId = useMemo(() => `modal-title-${crypto.randomUUID()}`, []);
+  const descriptionId = useMemo(() => `modal-description-${crypto.randomUUID()}`, []);
 
   useEffect(() => {
     if (isOpen) {
       previousActiveElement.current = document.activeElement;
+
       requestAnimationFrame(() => {
         const firstFocusable = modalRef.current?.querySelector<HTMLElement>(FOCUSABLE_SELECTOR);
-        firstFocusable?.focus();
+        if (firstFocusable) {
+          firstFocusable.focus();
+        } else {
+          modalRef.current?.focus();
+        }
       });
     } else {
       if (previousActiveElement.current instanceof HTMLElement) {
@@ -89,6 +94,8 @@ function Modal({ isOpen, onClose, children, title }: ModalProps) {
         role="dialog"
         aria-modal="true"
         aria-labelledby={titleId}
+        aria-describedby={descriptionId}
+        tabIndex={-1}
         className="modal-content"
         onClick={(e) => e.stopPropagation()}
       >
@@ -104,7 +111,9 @@ function Modal({ isOpen, onClose, children, title }: ModalProps) {
             ✕
           </button>
         </div>
-        <div className="modal-body">{children}</div>
+        <div id={descriptionId} className="modal-body">
+          {children}
+        </div>
       </div>
     </div>,
     document.body

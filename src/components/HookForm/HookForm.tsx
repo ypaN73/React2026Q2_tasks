@@ -30,8 +30,8 @@ function HookForm({ isOpen, onClose }: HookFormProps) {
       name: '',
       age: 0,
       email: '',
-      gender: undefined,
-      terms: undefined,
+      gender: 'male',
+      terms: false as unknown as true,
       image: undefined,
       country: '',
       password: '',
@@ -125,10 +125,7 @@ function HookForm({ isOpen, onClose }: HookFormProps) {
 
         <div style={{ marginBottom: '12px' }}>
           <label htmlFor="rhf-gender">Gender:</label>
-          <select id="rhf-gender" {...register('gender')} defaultValue="">
-            <option value="" disabled>
-              Select gender
-            </option>
+          <select id="rhf-gender" {...register('gender')}>
             <option value="male">Male</option>
             <option value="female">Female</option>
             <option value="other">Other</option>

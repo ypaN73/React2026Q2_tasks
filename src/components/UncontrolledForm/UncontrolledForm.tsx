@@ -32,11 +32,16 @@ function UncontrolledForm({ isOpen, onClose }: UncontrolledFormProps) {
     const form = event.currentTarget;
     const formData = new FormData(form);
 
+    const genderValue = formData.get('gender') as string;
+    const validGenders = ['male', 'female', 'other'];
+
     const formValues: FormInputData = {
       name: (formData.get('name') as string) || '',
       age: parseInt(formData.get('age') as string, 10) || 0,
       email: (formData.get('email') as string) || '',
-      gender: (formData.get('gender') as FormInputData['gender']) || 'male',
+      gender: validGenders.includes(genderValue)
+        ? (genderValue as FormInputData['gender'])
+        : 'male',
       terms: formData.get('terms') === 'on',
       image: (formData.get('image') as File) || null,
       country: (formData.get('country') as string) || '',
