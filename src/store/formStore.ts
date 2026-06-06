@@ -1,5 +1,5 @@
-
 import { create } from 'zustand';
+
 export interface FormInputData {
   name: string;
   age: number;
@@ -18,7 +18,7 @@ export interface SubmittedForm {
   email: string;
   gender: 'male' | 'female' | 'other';
   terms: boolean;
-  image: string | null; // base64
+  image: string | null;
   country: string;
   password: string;
   confirmPassword: string;
