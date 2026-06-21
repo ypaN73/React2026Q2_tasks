@@ -1,0 +1,66 @@
+{
+  "app": {
+    "title": "Pokémon Search",
+    "description": "Search and explore Pokémon"
+  },
+  "nav": {
+    "home": "Home",
+    "about": "About"
+  },
+  "theme": {
+    "light": "☀️ Light",
+    "dark": "🌙 Dark",
+    "switchToLight": "Switch to light mode",
+    "switchToDark": "Switch to dark mode"
+  },
+  "search": {
+    "placeholder": "Search Pokémon...",
+    "button": "Search"
+  },
+  "results": {
+    "loading": "Loading...",
+    "noResults": "No Pokémon found.",
+    "notFound": "Pokémon \"{name}\" not found"
+  },
+  "pagination": {
+    "previous": "Previous",
+    "next": "Next",
+    "page": "Page {page} of {total}"
+  },
+  "refresh": {
+    "button": "🔄 Refresh"
+  },
+  "errorButton": {
+    "label": "Throw Error"
+  },
+  "errorBoundary": {
+    "title": "Oops! Something went wrong.",
+    "defaultMessage": "An unexpected error occurred.",
+    "tryAgain": "Try Again"
+  },
+  "flyout": {
+    "itemsSelected": "{count} {count, plural, one {item} other {items}} selected",
+    "unselectAll": "Unselect all",
+    "download": "Download"
+  },
+  "details": {
+    "loading": "Loading...",
+    "height": "Height",
+    "weight": "Weight",
+    "types": "Types",
+    "close": "Close details"
+  },
+  "about": {
+    "title": "About",
+    "description": "This is a Pokémon search application built with React and TypeScript.",
+    "author": "Author: Polina",
+    "githubProfile": "GitHub Profile",
+    "rsSchoolCourse": "RS School React Course",
+    "backToSearch": "← Back to Search"
+  },
+  "notFound": {
+    "title": "404",
+    "message": "Page not found",
+    "backToHome": "← Back to Home"
+  }
+}

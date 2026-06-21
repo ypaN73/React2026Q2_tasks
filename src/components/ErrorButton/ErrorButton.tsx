@@ -1,7 +1,11 @@
+'use client';
+
 import { useState } from 'react';
+import { useTranslations } from 'next-intl';
 import './ErrorButton.css';
 
-function ErrorButton() {
+export function ErrorButton() {
+  const t = useTranslations('errorButton');
   const [shouldThrow, setShouldThrow] = useState(false);
 
   const handleClick = () => {
@@ -14,9 +18,7 @@ function ErrorButton() {
 
   return (
     <button className="error-button" onClick={handleClick}>
-      Throw Error
+      {t('label')}
     </button>
   );
 }
-
-export default ErrorButton;

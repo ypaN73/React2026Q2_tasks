@@ -1,8 +1,13 @@
+'use client';
+
 import { useState, useEffect, type ReactNode } from 'react';
 import { ThemeContext } from './ThemeContext';
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
   const [theme, setTheme] = useState<'light' | 'dark'>(() => {
+    if (typeof window === 'undefined') {
+      return 'light';
+    }
     const savedTheme = localStorage.getItem('app-theme');
     return savedTheme === 'dark' ? 'dark' : 'light';
   });
@@ -12,8 +17,10 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   };
 
   useEffect(() => {
-    localStorage.setItem('app-theme', theme);
-    document.documentElement.setAttribute('data-theme', theme);
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('app-theme', theme);
+      document.documentElement.setAttribute('data-theme', theme);
+    }
   }, [theme]);
 
   return (

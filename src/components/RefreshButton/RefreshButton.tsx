@@ -1,7 +1,11 @@
+'use client';
+
 import { useQueryClient } from '@tanstack/react-query';
+import { useTranslations } from 'next-intl';
 import './RefreshButton.css';
 
-function RefreshButton() {
+export function RefreshButton() {
+  const t = useTranslations('refresh');
   const queryClient = useQueryClient();
 
   const handleRefresh = () => {
@@ -11,9 +15,7 @@ function RefreshButton() {
 
   return (
     <button className="refresh-button" onClick={handleRefresh}>
-      🔄 Refresh
+      {t('button')}
     </button>
   );
 }
-
-export default RefreshButton;
