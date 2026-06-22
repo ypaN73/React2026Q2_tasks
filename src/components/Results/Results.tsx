@@ -16,7 +16,6 @@ export function Results({ items, loading, error }: ResultsProps) {
   const t = useTranslations('results');
   const searchParams = useSearchParams();
   const router = useRouter();
-  const currentPage = searchParams.get('page') || '1';
   const toggleItem = useSelectedItemsStore((state) => state.toggleItem);
   const selectedItems = useSelectedItemsStore((state) => state.selectedItems);
 

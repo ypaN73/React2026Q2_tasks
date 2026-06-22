@@ -28,7 +28,7 @@ export function Search({ onSearch, previousTerm, onInitialSearch }: SearchProps)
     } else {
       onSearch(savedTerm);
     }
-  }, []);
+  }, [savedTerm, onSearch, onInitialSearch]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setTerm(e.target.value);
