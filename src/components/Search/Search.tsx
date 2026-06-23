@@ -1,5 +1,9 @@
-import { useState, useEffect, useCallback } from 'react';
-import useLocalStorage from '../../hooks/useLocalStorage';
+'use client';
+
+import { useState, useEffect, useCallback, useRef } from 'react';
+import { useTranslations } from 'next-intl';
+import { useRouter, useSearchParams } from 'next/navigation';
+import useLocalStorage from '@/hooks/useLocalStorage';
 import './Search.css';
 
 const STORAGE_KEY = 'pokemon-search-term';
@@ -10,9 +14,13 @@ interface SearchProps {
   onInitialSearch?: (term: string) => void;
 }
 
-function Search({ onSearch, previousTerm, onInitialSearch }: SearchProps) {
+export function Search({ onSearch, previousTerm, onInitialSearch }: SearchProps) {
+  const t = useTranslations('search');
+  const router = useRouter();
+  const searchParams = useSearchParams();
   const [savedTerm, setSavedTerm] = useLocalStorage(STORAGE_KEY, '');
   const [term, setTerm] = useState<string>(savedTerm);
+  const formRef = useRef<HTMLFormElement>(null);
 
   useEffect(() => {
     if (onInitialSearch) {
@@ -26,33 +34,41 @@ function Search({ onSearch, previousTerm, onInitialSearch }: SearchProps) {
     setTerm(e.target.value);
   };
 
-  const handleSearch = useCallback(() => {
-    const trimmed = term.trim();
+  const handleSubmit = useCallback(
+    (e: React.FormEvent) => {
+      e.preventDefault();
+      const trimmed = term.trim();
 
-    if (trimmed === previousTerm) {
-      return;
-    }
+      if (trimmed === previousTerm) {
+        return;
+      }
 
-    setSavedTerm(trimmed);
-    onSearch(trimmed);
-  }, [term, previousTerm, onSearch, setSavedTerm]);
+      setSavedTerm(trimmed);
+
+      const params = new URLSearchParams(searchParams.toString());
+      params.set('q', trimmed);
+      params.set('page', '1');
+      router.push(`?${params.toString()}`);
+      onSearch(trimmed);
+    },
+    [term, previousTerm, onSearch, setSavedTerm, router, searchParams]
+  );
 
   return (
     <section className="search-section">
-      <div className="search-controls">
+      <form ref={formRef} className="search-controls" onSubmit={handleSubmit}>
         <input
           type="text"
+          name="q"
           className="search-input"
-          placeholder="Search Pokémon..."
+          placeholder={t('placeholder')}
           value={term}
           onChange={handleInputChange}
         />
-        <button className="search-button" onClick={handleSearch}>
-          Search
+        <button type="submit" className="search-button">
+          {t('button')}
         </button>
-      </div>
+      </form>
     </section>
   );
 }
-
-export default Search;

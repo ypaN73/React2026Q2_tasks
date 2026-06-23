@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { fetchPokemonList } from '../../services/pokemonApi';
+import { fetchPokemonList } from '@/services/pokemonApi';
 
 export function usePokemonList(term: string, page: number) {
   return useQuery({

@@ -1,6 +1,9 @@
-import { Link, useSearchParams } from 'react-router';
-import type { PokemonItem } from '../../types/pokemon';
-import { useSelectedItemsStore } from '../../store/selectedItemsStore';
+'use client';
+
+import { useSearchParams, useRouter } from 'next/navigation';
+import type { PokemonItem } from '@/types/pokemon';
+import { useSelectedItemsStore } from '@/store/selectedItemsStore';
+import { useTranslations } from 'next-intl';
 import './Results.css';
 
 interface ResultsProps {
@@ -9,13 +12,23 @@ interface ResultsProps {
   error: string | null;
 }
 
-function Results({ items, loading, error }: ResultsProps) {
-  const [searchParams] = useSearchParams();
-  const currentPage = searchParams.get('page') || '1';
+export function Results({ items, loading, error }: ResultsProps) {
+  const t = useTranslations('results');
+  const searchParams = useSearchParams();
+  const router = useRouter();
   const toggleItem = useSelectedItemsStore((state) => state.toggleItem);
   const selectedItems = useSelectedItemsStore((state) => state.selectedItems);
 
-  const handleCheckboxChange = (event: React.ChangeEvent<HTMLInputElement>, item: PokemonItem) => {
+  const handleCardClick = (name: string) => {
+    const params = new URLSearchParams(searchParams.toString());
+    params.set('details', name);
+    router.push(`?${params.toString()}`);
+  };
+
+  const handleCheckboxChange = (
+    event: React.ChangeEvent<HTMLInputElement>,
+    item: PokemonItem
+  ) => {
     event.stopPropagation();
     toggleItem(item);
   };
@@ -23,7 +36,7 @@ function Results({ items, loading, error }: ResultsProps) {
   if (loading) {
     return (
       <section className="results-section">
-        <div className="results-status">Loading...</div>
+        <div className="results-status">{t('loading')}</div>
       </section>
     );
   }
@@ -39,7 +52,7 @@ function Results({ items, loading, error }: ResultsProps) {
   if (items.length === 0) {
     return (
       <section className="results-section">
-        <div className="results-status">No Pokémon found.</div>
+        <div className="results-status">{t('noResults')}</div>
       </section>
     );
   }
@@ -49,26 +62,31 @@ function Results({ items, loading, error }: ResultsProps) {
       <ul className="results-list">
         {items.map((item) => (
           <li key={item.name}>
-            <Link
-              to={`/${item.name}?page=${currentPage}`}
+            <div
               className="result-card"
-              style={{ textDecoration: 'none', color: 'inherit' }}
+              onClick={() => handleCardClick(item.name)}
+              role="button"
+              tabIndex={0}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') handleCardClick(item.name);
+              }}
+              style={{ cursor: 'pointer' }}
             >
               <input
                 type="checkbox"
                 className="result-checkbox"
-                checked={selectedItems.some((selected) => selected.name === item.name)}
+                checked={selectedItems.some(
+                  (selected) => selected.name === item.name
+                )}
                 onChange={(e) => handleCheckboxChange(e, item)}
                 onClick={(e) => e.stopPropagation()}
               />
               <span className="result-name">{item.name}</span>
               <span className="result-description">{item.description}</span>
-            </Link>
+            </div>
           </li>
         ))}
       </ul>
     </section>
   );
 }
-
-export default Results;

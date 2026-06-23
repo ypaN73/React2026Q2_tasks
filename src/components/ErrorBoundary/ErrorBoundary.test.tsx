@@ -3,7 +3,9 @@ import userEvent from '@testing-library/user-event';
 import { describe, it, expect, vi } from 'vitest';
 import { Component } from 'react';
 import type { ReactNode } from 'react';
-import ErrorBoundary from './ErrorBoundary';
+import { NextIntlClientProvider } from 'next-intl';
+import { ErrorBoundary } from './ErrorBoundary';
+import enMessages from '../../messages/en.json';
 
 class FaultyComponent extends Component {
   render(): ReactNode {
@@ -25,9 +27,17 @@ class FaultyNoMessage extends Component {
   }
 }
 
+function renderWithProviders(ui: ReactNode) {
+  return render(
+    <NextIntlClientProvider locale="en" messages={enMessages}>
+      {ui}
+    </NextIntlClientProvider>
+  );
+}
+
 describe('ErrorBoundary', () => {
   it('renders children when no error', () => {
-    render(
+    renderWithProviders(
       <ErrorBoundary>
         <StableComponent />
       </ErrorBoundary>
@@ -37,7 +47,7 @@ describe('ErrorBoundary', () => {
 
   it('displays fallback UI when child throws', () => {
     const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => { });
-    render(
+    renderWithProviders(
       <ErrorBoundary>
         <FaultyComponent />
       </ErrorBoundary>
@@ -51,7 +61,7 @@ describe('ErrorBoundary', () => {
 
   it('logs error to console when child throws', () => {
     const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => { });
-    render(
+    renderWithProviders(
       <ErrorBoundary>
         <FaultyComponent />
       </ErrorBoundary>
@@ -62,8 +72,7 @@ describe('ErrorBoundary', () => {
 
   it('shows default error message if error has no message', () => {
     const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => { });
-
-    render(
+    renderWithProviders(
       <ErrorBoundary>
         <FaultyNoMessage />
       </ErrorBoundary>
@@ -96,7 +105,7 @@ describe('ErrorBoundary', () => {
       }
     }
 
-    render(
+    renderWithProviders(
       <ErrorBoundary>
         <ResettableComponent />
       </ErrorBoundary>

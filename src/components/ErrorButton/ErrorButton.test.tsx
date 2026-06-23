@@ -3,7 +3,9 @@ import userEvent from '@testing-library/user-event';
 import { describe, it, expect, vi } from 'vitest';
 import { Component } from 'react';
 import type { ReactNode } from 'react';
-import ErrorButton from './ErrorButton';
+import { NextIntlClientProvider } from 'next-intl';
+import { ErrorButton } from './ErrorButton';
+import enMessages from '../../messages/en.json';
 
 class TestErrorBoundary extends Component<
   { children: ReactNode },
@@ -26,9 +28,17 @@ class TestErrorBoundary extends Component<
   }
 }
 
+function renderWithProviders(ui: ReactNode) {
+  return render(
+    <NextIntlClientProvider locale="en" messages={enMessages}>
+      {ui}
+    </NextIntlClientProvider>
+  );
+}
+
 describe('ErrorButton', () => {
   it('renders the error button', () => {
-    render(<ErrorButton />);
+    renderWithProviders(<ErrorButton />);
     expect(
       screen.getByRole('button', { name: 'Throw Error' })
     ).toBeInTheDocument();
@@ -36,7 +46,7 @@ describe('ErrorButton', () => {
 
   it('throws error and triggers error boundary fallback', async () => {
     const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => { });
-    render(
+    renderWithProviders(
       <TestErrorBoundary>
         <ErrorButton />
       </TestErrorBoundary>

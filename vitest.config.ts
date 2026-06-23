@@ -1,9 +1,7 @@
-/// <reference types="vitest/config" />
-import { defineConfig } from 'vite';
-import react from '@vitejs/plugin-react';
+import { defineConfig } from 'vitest/config';
+import path from 'path';
 
 export default defineConfig({
-  plugins: [react()],
   test: {
     globals: true,
     environment: 'jsdom',
@@ -14,10 +12,8 @@ export default defineConfig({
       exclude: [
         'src/**/*.test.{ts,tsx}',
         'src/**/*.spec.{ts,tsx}',
-        'src/index.{ts,tsx}',
-        'src/setupTests.{ts}',
+        'src/setupTests.ts',
         'src/**/*.d.ts',
-        'src/main.tsx',
       ],
       thresholds: {
         global: {
@@ -27,6 +23,11 @@ export default defineConfig({
           lines: 50,
         },
       },
+    },
+  },
+  resolve: {
+    alias: {
+      '@': path.resolve(__dirname, './src'),
     },
   },
 });

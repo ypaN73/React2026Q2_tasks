@@ -1,0 +1,66 @@
+{
+  "app": {
+    "title": "Поиск Покемонов",
+    "description": "Поиск и изучение покемонов"
+  },
+  "nav": {
+    "home": "Главная",
+    "about": "О проекте"
+  },
+  "theme": {
+    "light": "☀️ Светлая",
+    "dark": "🌙 Тёмная",
+    "switchToLight": "Переключить на светлую тему",
+    "switchToDark": "Переключить на тёмную тему"
+  },
+  "search": {
+    "placeholder": "Поиск покемонов...",
+    "button": "Поиск"
+  },
+  "results": {
+    "loading": "Загрузка...",
+    "noResults": "Покемоны не найдены.",
+    "notFound": "Покемон \"{name}\" не найден"
+  },
+  "pagination": {
+    "previous": "Назад",
+    "next": "Вперёд",
+    "page": "Страница {page} из {total}"
+  },
+  "refresh": {
+    "button": "🔄 Обновить"
+  },
+  "errorButton": {
+    "label": "Вызвать ошибку"
+  },
+  "errorBoundary": {
+    "title": "Упс! Что-то пошло не так.",
+    "defaultMessage": "Произошла непредвиденная ошибка.",
+    "tryAgain": "Попробовать снова"
+  },
+  "flyout": {
+    "itemsSelected": "{count} {count, plural, one {элемент} few {элемента} many {элементов} other {элементов}} выбрано",
+    "unselectAll": "Снять выделение",
+    "download": "Скачать"
+  },
+  "details": {
+    "loading": "Загрузка...",
+    "height": "Рост",
+    "weight": "Вес",
+    "types": "Типы",
+    "close": "Закрыть детали"
+  },
+  "about": {
+    "title": "О проекте",
+    "description": "Это приложение для поиска покемонов, созданное с помощью React и TypeScript.",
+    "author": "Автор: Polina",
+    "githubProfile": "GitHub Профиль",
+    "rsSchoolCourse": "RS School React Курс",
+    "backToSearch": "← Назад к поиску"
+  },
+  "notFound": {
+    "title": "404",
+    "message": "Страница не найдена",
+    "backToHome": "← На главную"
+  }
+}
